@@ -1,0 +1,22 @@
+-e .[toml]
+
+# Testing
+pytest
+pytest-cov
+
+# Docs (pin Sphinx until sphinx_rtd is compatible with a more recent version)
+# FIXME: is this still necessary?
+sphinx<2
+sphinx_rtd_theme
+
+# Quality
+check-manifest
+check-oldies
+isort[pyproject]
+mypy
+pylint
+pylint_strict_informational
+twine
+
+# Release
+zest.releaser[recommended]
