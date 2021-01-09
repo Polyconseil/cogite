@@ -1,4 +1,5 @@
 import dataclasses
+import os
 import re
 import subprocess
 
@@ -13,11 +14,9 @@ class CommandResult:
     stderr: str
 
 
-# Decode bytestring and turn into a (possibly empty) list of lines.
 def get_lines(bytestring):
-    if not bytestring:  # avoid return `['']`
-        return []
-    lines = bytestring.strip().decode('utf-8').split('\n')
+    """Decode bytestring and turn into a (possibly empty) list of lines."""
+    lines = bytestring.strip().decode('utf-8').split(os.linesep)
     # Remove text if it's followed by "\r". `git rebase` does that to
     # show work in progress, which we are not interested to see.
     lines = [re.sub(r".*\r", "", line) for line in lines]
@@ -30,8 +29,6 @@ def _run(command: str, capture_output=True):
         capture_output=capture_output,
         check=False,
     )
-    # FIXME: is there any point in returning a list of lines instead of a
-    # string?
     return CommandResult(
         returncode=result.returncode,
         stdout=get_lines(result.stdout),
@@ -64,8 +61,8 @@ def run(
             # XXX: Printing stdout and *then* stderr may not
             # correspond to the order in which the output would have
             # appeared if we had not captured it.
-            err = f"Got the following output when running `{command}`:\n"
-            err += '\n'.join(result.stdout + result.stderr)
+            err = f"Got the following output when running `{command}`:{os.linesep}"
+            err += os.linesep.join(result.stdout + result.stderr)
         else:
             err = f"Got an empty error when running `{command}`."
         raise errors.FatalError(err)

@@ -39,7 +39,8 @@ def get_remote_origin_url():
     try:
         return shell.run("git ls-remote --get-url").stdout[0]
     except errors.FatalError as exc:
-        raise errors.FatalError(f"{str(exc)}\ncogite must be run from a Git checkout.") from exc
+        err = f"{str(exc)}{os.linesep}cogite must be run from a Git checkout."
+        raise errors.FatalError(err) from exc
 
 
 def get_commits_logs(base_branch, branch):

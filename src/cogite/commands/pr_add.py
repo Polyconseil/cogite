@@ -34,15 +34,17 @@ def add_pull_request(context, *, base_branch, draft=False):
         filter(None, [commits_text, _get_pull_request_template()])
     ).strip()
 
-    print(f'Confirm title and body:\n--- 8-> ---\n{content}\n--- 8-> ---')
+    print(os.linesep.join((
+        'Confirm title and body:',
+        '--- 8-> ---',
+        content,
+        '--- 8-> ---',
+    )))
     confirmed = interaction.confirm(defaults_to_yes=True, with_edit_choice=True)
     if not confirmed:
         return
     if confirmed is interaction.EDIT:
-        content = (
-            interaction.input_from_file(starting_text=f'{content}\n')
-            or content
-        )
+        content = interaction.input_from_file(starting_text=content) or content
 
     iterator = iter(content.splitlines(keepends=True))
     # title is the first line of the file
@@ -109,9 +111,9 @@ def _git_push_to_origin(current_branch_name):
     elif result.returncode == 0:  # upstream branch is already configured
         command = 'git push'
     else:
-        error = '\n'.join(result.stderr)
+        error = os.linesep.join(result.stderr)
         raise errors.FatalError(
-            f"Got the following error when pushing upstream:\n{error}"
+            f"Got the following error when pushing upstream:{os.linesep}{error}"
         )
 
     shell.run(

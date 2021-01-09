@@ -46,7 +46,7 @@ def check_commits(
             )
         else:
             msg = f"⚠ You are about to push these {n_commits} commits to {branch}:"
-        print(f"\n{msg}")
+        print(f"{os.linesep}{msg}")
 
         n_to_display = min(n_commits, display_n_commits)
         print(run_command(f'git log --pretty="%h %s" -n {n_to_display} {commit_range}'))
@@ -66,7 +66,7 @@ def check_commits(
             "squashable or work-in-progress commits:"
         )
         print(squashable_commits)
-        print("\nPerhaps you have forgotten to squash them.")
+        print(f"{os.linesep}Perhaps you have forgotten to squash them.")
         if not interaction.confirm(defaults_to_yes=False):
             return False
 
