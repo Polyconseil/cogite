@@ -18,6 +18,8 @@ class Configuration:
     host_api_url: str = "https://api.github.com"
     status_poll_frequency: int = 10  # seconds
 
+    enable_pre_merge_checks: bool = True
+
     ci_url: Optional[str] = None
     ci_platform: Optional[str] = None
 
@@ -33,7 +35,10 @@ def _replace_dashes(options: dict) -> dict:
     """Recursively replace dashes by underscores in dictonary keys."""
     if not isinstance(options, dict):
         return options
-    return {option.replace("-", "_"): _replace_dashes(value) for option, value in options.items()}
+    return {
+        option.replace("-", "_"): _replace_dashes(value)
+        for option, value in options.items()
+    }
 
 
 def _quote_for_path(url: str) -> str:
@@ -44,15 +49,15 @@ def get_configuration(context):
     config = {}
 
     user_project_dir = COGITE_CONFIG_DIR / _quote_for_path(context.remote_url)
-    locations = [
-        COGITE_CONFIG_DIR / 'config.toml',
-        user_project_dir / 'config.toml',
-        pathlib.Path('./.pyproject.toml'),
-        pathlib.Path('./cogite.toml'),
-    ]
-    for location in locations:
+    locations_sections = (
+        (COGITE_CONFIG_DIR / 'config.toml', None),
+        (user_project_dir / 'config.toml', None),
+        (pathlib.Path('./pyproject.toml'), 'tool.cogite'),
+        (pathlib.Path('./cogite.toml'), None)
+    )
+    for location, section in locations_sections:
         if not location.exists():
             continue
-        config.update(**_replace_dashes(read_toml(location)))
+        config.update(**_replace_dashes(read_toml(location, section)))
 
     return Configuration(**config)

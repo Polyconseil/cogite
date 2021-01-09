@@ -22,6 +22,8 @@ def merge_pull_request(context):
     things (usually by fixing merge conflicts) and try again.
     """
     client = context.client
+    configuration = context.configuration
+
     with spinner.get_for_git_host_call():
         pull_request = client.get_pull_request()
     if not pull_request:
@@ -53,8 +55,7 @@ def merge_pull_request(context):
     run_with_progress(f'git checkout {destination_branch}')
     run_with_progress(f'git rebase {branch}')  # this rebase should not fail
 
-    # FIXME: could be enabled/disabled through configuration
-    if not cogite.checks.pre_merge.check_commits(
+    if configuration.enable_pre_merge_checks and not cogite.checks.pre_merge.check_commits(
         git.get_current_sha(), git.get_remote_branch(), git.get_remote_sha()
     ):
         current_branch = git.get_current_branch()  # get it again (safety belt)
