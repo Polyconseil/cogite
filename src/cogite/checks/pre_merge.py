@@ -31,11 +31,6 @@ def check_commits(
     # `remote_ref` looks like 'refs/heads/<branch_name>'
     branch = remote_ref.split("/", 2)[-1]
 
-    # FIXME: make these branch names configurable
-    if branch not in ("master", "prod") and not branch.startswith("maint/"):
-        # Users are free to push anything to development branches.
-        sys.exit(0)
-
     commit_range = f"{remote_sha}..{local_sha}"
     n_commits = int(run_command(f"git rev-list {commit_range} | wc -l"))
     if n_commits >= MAX_COMMITS:
