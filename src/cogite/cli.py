@@ -42,8 +42,7 @@ def get_parser():
         subparser.add_argument(
             '--base',
             dest='base_branch',
-            default='master',
-            help='branch where changes should be applied. Defaults to master.',
+            help='branch where changes should be applied. Defaults to the master branch.',
         )
 
     pr_add.add_argument(

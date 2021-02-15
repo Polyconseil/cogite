@@ -18,6 +18,8 @@ class Configuration:
     host_api_url: str = "https://api.github.com"
     status_poll_frequency: int = 10  # seconds
 
+    master_branch: str = "master"
+
     enable_pre_merge_checks: bool = True
 
     ci_url: Optional[str] = None

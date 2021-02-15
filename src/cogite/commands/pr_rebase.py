@@ -3,13 +3,19 @@ from cogite import shell
 from . import helpers
 
 
-def rebase_branch(context, *, print_success=True, rebase_from='master'):
+MASTER_BRANCH = object()
+
+
+def rebase_branch(context, *, print_success=True, rebase_from=MASTER_BRANCH):
     """Rebase a branch off of upstream master (or any other branch).
 
     This changes the local current and master branch (not upstream).
     """
+    configuration = context.configuration
     branch = context.branch
-    helpers.assert_current_branch_is_not_master(branch)
+    if rebase_from is MASTER_BRANCH:
+        rebase_from = configuration.master_branch
+    helpers.assert_current_branch_is_feature_branch(branch, configuration.master_branch)
 
     for command in (
         f'git checkout {rebase_from}',
