@@ -28,7 +28,7 @@ def set(key, value):  # pylint: disable=redefined-builtin
     try:
         current = json.loads(COGITE_CACHE_FILE.read_text())
     except FileNotFoundError:
-        COGITE_CACHE_DIR.mkdir(0o700, parents=True)
+        COGITE_CACHE_DIR.mkdir(0o700, parents=True, exist_ok=True)
         current = {}
     current[key] = value
     COGITE_CACHE_FILE.write_text(_encode(current))
