@@ -12,7 +12,7 @@ def show_status(context, poll=False):
     configuration = context.configuration
 
     with spinner.get_for_git_host_call():
-        pull_request = client.get_pull_request()
+        pull_request = client.pull_request
     if not pull_request:
         raise errors.FatalError(
             f"There is no open pull request on the current branch {context.branch}"
