@@ -23,10 +23,11 @@ def get_lines(bytestring):
     return [l for l in lines if l]
 
 
-def _run(command: str, capture_output=True):
+def _run(command: str):
     result = subprocess.run(
         command.split(' '),
-        capture_output=capture_output,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         check=False,
     )
     return CommandResult(
