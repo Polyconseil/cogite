@@ -238,7 +238,7 @@ class GitHubApiClient(base.BaseClient):
     def repository(self):
         if hasattr(self, '_repository'):
             return self._repository  # pylint: disable=access-member-before-definition
-        cache_key = self.context.repository
+        cache_key = self.context.remote_url
         cached = cache.get(cache_key)
         if cached is not cache.NOT_SET:
             self._repository = cached
