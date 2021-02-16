@@ -1,6 +1,8 @@
 import collections
 import dataclasses
 import json
+import os
+import pathlib
 import time
 from typing import Dict
 from typing import Iterable
@@ -20,163 +22,18 @@ from cogite import spinner
 from . import base
 
 
-QUERY_GET_REPOSITORY = """\
-query ($owner: String!, $repositoryName: String!) {
-  repository(owner: $owner, name: $repositoryName) {
-    deleteBranchOnMerge,
-    id,
-  }
-}
-"""
+GRAPHQL_DIRECTORY = pathlib.Path(os.path.dirname(__file__)) / 'graphql' / 'github'
 
-QUERY_GET_REPOSITORY_CONTRIBUTORS = """\
-query getRepositoryId(
-  $owner: String!, $repositoryName: String!, $paginationCursor: String
-) {
-  repository(owner: $owner, name: $repositoryName) {
-    collaborators(first: 100, after: $paginationCursor) {
-      nodes {
-        id,
-        login,
-        name,
-      }
-      pageInfo {
-        hasNextPage,
-        endCursor,
-      }
-      totalCount,
-    }
-  }
-}
-"""
+def get_graphql(stem):
+    return (GRAPHQL_DIRECTORY / f"{stem}.graphql").read_text()
 
-QUERY_GET_PULL_REQUEST = """\
-query getPullRequest(
-  $owner: String!, $repositoryName: String!, $headRefName: String!
-) {
-  repository(owner: $owner, name: $repositoryName) {
-    pullRequests(headRefName: $headRefName, states: OPEN, first: 1) {
-      nodes {
-        baseRefName,
-        id,
-        number,
-        permalink,
-      }
-      pageInfo {
-        hasNextPage,
-        endCursor,
-      }
-      totalCount,
-    }
-  }
-}
-"""
-
-QUERY_GET_PULL_REQUEST_STATUS = """\
-query getPullRequestStatus(
-   $pullRequestId: ID!,
-) {
-  node(id: $pullRequestId ) {
-    ... on PullRequest {
-      commits(last: 1) {
-        nodes {
-          commit {
-            oid,
-            checkSuites(last: 1) {
-              nodes {
-                checkRuns(last: 50) {
-                  nodes {
-                    conclusion,
-                    name,
-                    permalink,
-                    status,
-                  }
-                }
-              }
-            },
-            status {
-              state
-              contexts {
-                context,
-                state,
-                targetUrl,
-              }
-            },
-          }
-        }
-      },
-      reviewRequests(first: 20) {
-        nodes {
-          requestedReviewer {
-            ... on User {
-              login,
-            }
-          }
-        }
-      },
-      reviews(first: 20) {
-        nodes {
-          author {
-            login,
-          },
-          state,
-        }
-      }
-    }
-  }
-}
-"""
-
-MUTATION_CREATE_PULL_REQUEST = """\
-mutation (
-  $repositoryId: ID!,
-  $headRefName: String!,
-  $baseRefName: String!,
-  $title: String!,
-  $body: String!,
-  $draft: Boolean!,
-) {
-  createPullRequest(input: {
-    repositoryId: $repositoryId,
-    headRefName: $headRefName,
-    baseRefName: $baseRefName,
-    title: $title,
-    body: $body,
-    draft: $draft,
-  }) {
-    pullRequest {
-      id,
-      number,
-      permalink,
-    }
-  }
-}
-"""
-
-MUTATION_MARK_PULL_REQUEST_AS_READY = """\
-mutation ($pullRequestId: ID!) {
-  markPullRequestReadyForReview(input: {pullRequestId: $pullRequestId})
-  {
-    clientMutationId,
-  }
-}
-"""
-
-MUTATION_REQUEST_REVIEWS = """\
-mutation (
-  $pullRequestId: String!,
-  $userIds: [ID!],
-) {
-  requestReviews(input: {
-    pullRequestId: $pullRequestId,
-    union: true,
-    userIds: $userIds,
-  })
-  {
-    clientMutationId,
-  }
-}
-"""
+QUERY_REPOSITORY = get_graphql('query_repository')
+QUERY_REPOSITORY_CONTRIBUTORS = get_graphql('query_repository_contributors')
+QUERY_PULL_REQUEST = get_graphql('query_pull_request')
+QUERY_PULL_REQUEST_STATUS = get_graphql('query_pull_request_status')
+MUTATION_CREATE_PULL_REQUEST = get_graphql('mutation_create_pull_request')
+MUTATION_MARK_AS_READY = get_graphql('mutation_mark_as_ready')
+MUTATION_REQUEST_REVIEWS = get_graphql('mutation_request_reviews')
 
 
 def _get_pull_request_status(response: dict) -> models.PullRequestStatus:
@@ -337,7 +194,7 @@ class GitHubApiClient(base.BaseClient):
         return repository
 
     def _get_repository_from_host(self):
-        query = QUERY_GET_REPOSITORY
+        query = QUERY_REPOSITORY
         variables = {
             'owner': self.owner,
             'repositoryName': self.repository_name,
@@ -357,7 +214,7 @@ class GitHubApiClient(base.BaseClient):
 
     def get_pull_request(self, branch=None) -> Optional[models.PullRequest]:
         branch = branch or self.context.branch
-        query = QUERY_GET_PULL_REQUEST
+        query = QUERY_PULL_REQUEST
         variables = {
             'owner': self.owner,
             'repositoryName': self.repository_name,
@@ -421,7 +278,7 @@ class GitHubApiClient(base.BaseClient):
         # FIXME: check response
 
     def get_collaborators(self) -> Iterable[models.User]:
-        query = QUERY_GET_REPOSITORY_CONTRIBUTORS
+        query = QUERY_REPOSITORY_CONTRIBUTORS
         variables = {
             'owner': self.owner,
             'repositoryName': self.repository_name,
@@ -446,14 +303,14 @@ class GitHubApiClient(base.BaseClient):
         return collaborators
 
     def mark_pull_request_as_ready(self):
-        mutation = MUTATION_MARK_PULL_REQUEST_AS_READY
+        mutation = MUTATION_MARK_AS_READY
         variables = {
             'pullRequestId': self.pull_request.id,
         }
         self._post(mutation, variables)
 
     def get_pull_request_status(self) -> models.PullRequestStatus:
-        query = QUERY_GET_PULL_REQUEST_STATUS
+        query = QUERY_PULL_REQUEST_STATUS
         variables = {
             'pullRequestId': self.pull_request.id,
         }

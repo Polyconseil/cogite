@@ -1,0 +1,18 @@
+query getRepositoryId(
+  $owner: String!, $repositoryName: String!, $paginationCursor: String
+) {
+  repository(owner: $owner, name: $repositoryName) {
+    collaborators(first: 100, after: $paginationCursor) {
+      nodes {
+        id,
+        login,
+        name,
+      }
+      pageInfo {
+        hasNextPage,
+        endCursor,
+      }
+      totalCount,
+    }
+  }
+}

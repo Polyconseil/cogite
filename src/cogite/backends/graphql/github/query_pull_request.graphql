@@ -1,0 +1,19 @@
+query getPullRequest(
+  $owner: String!, $repositoryName: String!, $headRefName: String!
+) {
+  repository(owner: $owner, name: $repositoryName) {
+    pullRequests(headRefName: $headRefName, states: OPEN, first: 1) {
+      nodes {
+        baseRefName,
+        id,
+        number,
+        permalink,
+      }
+      pageInfo {
+        hasNextPage,
+        endCursor,
+      }
+      totalCount,
+    }
+  }
+}

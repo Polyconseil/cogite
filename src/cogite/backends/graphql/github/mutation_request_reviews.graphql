@@ -1,0 +1,13 @@
+mutation (
+  $pullRequestId: String!,
+  $userIds: [ID!],
+) {
+  requestReviews(input: {
+    pullRequestId: $pullRequestId,
+    union: true,
+    userIds: $userIds,
+  })
+  {
+    clientMutationId,
+  }
+}

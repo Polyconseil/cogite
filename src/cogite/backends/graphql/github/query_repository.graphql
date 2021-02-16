@@ -1,0 +1,6 @@
+query ($owner: String!, $repositoryName: String!) {
+  repository(owner: $owner, name: $repositoryName) {
+    deleteBranchOnMerge,
+    id,
+  }
+}

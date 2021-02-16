@@ -1,0 +1,52 @@
+query getPullRequestStatus(
+   $pullRequestId: ID!,
+) {
+  node(id: $pullRequestId ) {
+    ... on PullRequest {
+      commits(last: 1) {
+        nodes {
+          commit {
+            oid,
+            checkSuites(last: 1) {
+              nodes {
+                checkRuns(last: 50) {
+                  nodes {
+                    conclusion,
+                    name,
+                    permalink,
+                    status,
+                  }
+                }
+              }
+            },
+            status {
+              state
+              contexts {
+                context,
+                state,
+                targetUrl,
+              }
+            },
+          }
+        }
+      },
+      reviewRequests(first: 20) {
+        nodes {
+          requestedReviewer {
+            ... on User {
+              login,
+            }
+          }
+        }
+      },
+      reviews(first: 20) {
+        nodes {
+          author {
+            login,
+          },
+          state,
+        }
+      }
+    }
+  }
+}
