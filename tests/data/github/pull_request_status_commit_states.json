@@ -1,0 +1,72 @@
+{
+  "data": {
+    "node": {
+      "commits": {
+        "nodes": [
+          {
+            "commit": {
+              "oid": "sha-sha-sha",
+              "checkSuites": {
+                "nodes": [
+                  {
+                    "checkRuns": {
+                      "nodes": []
+                    }
+                  }
+                ]
+              },
+              "status": {
+                "state": "PENDING",
+                "contexts": [
+                  {
+                    "context": "ci/circleci: Run quality checks after commit",
+                    "state": "PENDING",
+                    "targetUrl": "https://example.com/ci/1234"
+                  },
+                  {
+                    "context": "ci/circleci: Run tests after commit",
+                    "state": "PENDING",
+                    "targetUrl": "https://example.com/ci/7883"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "reviewRequests": {
+        "nodes": [
+          {
+            "requestedReviewer": {
+              "id": "1",
+              "login": "reviewer1",
+              "name": "Reviewer 1"
+            }
+          }
+        ]
+      },
+      "reviews": {
+        "nodes": [
+          {
+            "author": {
+              "login": "reviewer2"
+            },
+            "state": "APPROVED"
+          },
+          {
+            "author": {
+              "login": "reviewer3"
+            },
+            "state": "COMMENTED"
+          },
+          {
+            "author": {
+              "login": "reviewer3"
+            },
+            "state": "APPROVED"
+          }
+        ]
+      }
+    }
+  }
+}

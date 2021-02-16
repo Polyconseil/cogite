@@ -8,6 +8,11 @@ class CommitState(enum.Enum):
     FAILURE = 'failure'
     PENDING = 'pending'
     SUCCESS = 'success'
+    # `UNKNOWN` is used in Cogite when the status reported by GitHub:
+    # - is not known by Cogite;
+    # - or is not clear and explicit;
+    # - or does not obviously map to the other values above.
+    UNKNOWN = 'unknown'
 
 
 class ReviewState(enum.Enum):
@@ -15,6 +20,11 @@ class ReviewState(enum.Enum):
     COMMENTED = 'commented'
     PENDING = 'pending'
     REJECTED = 'rejected'
+    # `UNKNOWN` is used in Cogite when the status reported by GitHub:
+    # - is not known by Cogite;
+    # - or is not clear and explicit;
+    # - or does not obviously map to the other values above.
+    UNKNOWN = 'unknown'
 
 
 @dataclasses.dataclass

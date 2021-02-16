@@ -1,0 +1,62 @@
+{
+  "data": {
+    "node": {
+      "commits": {
+        "nodes": [
+          {
+            "commit": {
+              "oid": "7c38f8108e9aee12470d4874c0cf2b14b92db33e",
+              "checkSuites": {
+                "nodes": [
+                  {
+                    "checkRuns": {
+                      "nodes": [
+                        {
+                          "name": "quality",
+                          "conclusion": "SUCCESS",
+                          "permalink": "https://github.com/Polyconseil/cogite/runs/1906337703",
+                          "status": "COMPLETED"
+                        },
+                        {
+                          "name": "test (3.6)",
+                          "conclusion": "SUCCESS",
+                          "permalink": "https://github.com/Polyconseil/cogite/runs/1906337749",
+                          "status": "COMPLETED"
+                        },
+                        {
+                          "name": "test (3.7)",
+                          "conclusion": "SUCCESS",
+                          "permalink": "https://github.com/Polyconseil/cogite/runs/1906337759",
+                          "status": "COMPLETED"
+                        },
+                        {
+                          "name": "test (3.8)",
+                          "conclusion": "SUCCESS",
+                          "permalink": "https://github.com/Polyconseil/cogite/runs/1906337778",
+                          "status": "COMPLETED"
+                        },
+                        {
+                          "name": "test (3.9)",
+                          "conclusion": "SUCCESS",
+                          "permalink": "https://github.com/Polyconseil/cogite/runs/1906337788",
+                          "status": "COMPLETED"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "status": null
+            }
+          }
+        ]
+      },
+      "reviewRequests": {
+        "nodes": []
+      },
+      "reviews": {
+        "nodes": []
+      }
+    }
+  }
+}

@@ -81,7 +81,19 @@ query getPullRequestStatus(
       commits(last: 1) {
         nodes {
           commit {
-            oid
+            oid,
+            checkSuites(last: 1) {
+              nodes {
+                checkRuns(last: 50) {
+                  nodes {
+                    conclusion,
+                    name,
+                    permalink,
+                    status,
+                  }
+                }
+              }
+            },
             status {
               state
               contexts {
@@ -89,7 +101,7 @@ query getPullRequestStatus(
                 state,
                 targetUrl,
               }
-            }
+            },
           }
         }
       },
@@ -167,30 +179,106 @@ mutation (
 """
 
 
+def _get_pull_request_status(response: dict) -> models.PullRequestStatus:
+    pr_info = response['data']['node']
+    commit_info = pr_info['commits']['nodes'][0]['commit']
+    status = models.PullRequestStatus(sha=commit_info['oid'])
 
-def _to_cogite_commit_state(github_state):
-    # https://docs.github.com/en/free-pro-team@latest/graphql/reference/enums#statusstate
+    # Depending on the CI configuration, we end up with either commit
+    # statuses or checks. Look at both.
+    if commit_info['status']:
+        status.checks = [
+            models.PullRequestCheck(
+                name=context['context'],
+                state=_gh_commit_status_to_cogite_commit_state(context['state']),
+                url=context['targetUrl'],
+            )
+            for context in commit_info['status']['contexts']
+        ]
+    elif commit_info['checkSuites']:
+        status.checks = [
+            models.PullRequestCheck(
+                name=run['name'],
+                state=_gh_check_run_status_to_cogite_commit_state(
+                    run['status'], run['conclusion']
+                ),
+                url=run['permalink'],
+            )
+            for run in commit_info['checkSuites']['nodes'][0]['checkRuns']['nodes']
+        ]
+
+    # The 'reviews' nodes in the response only contain reviews
+    # that have been performed. Pending reviews are only available
+    # through the 'reviewRequests' nodes.
+    reviews: Dict[str, List[models.ReviewState]] = collections.defaultdict(list)
+    # GitHub returns a full User object in 'reviewRequests', but
+    # an Author object (with only the login) in 'reviews'. We'll
+    # use the lowest common denominator, i.e. login only.
+    for request in pr_info['reviewRequests']['nodes']:
+        user_reviews = reviews[request['requestedReviewer']['login']]
+        user_reviews.append(models.ReviewState.PENDING)
+    for review in pr_info['reviews']['nodes']:
+        user_reviews = reviews[review['author']['login']]
+        user_reviews.append(_gh_review_state_to_cogite_review_state(review['state']))
+    # If a user commented on the pull request and then approved
+    # it, we'll have two reviews. Merge them by keeping the most
+    # relevant state.
+    for login, review_states in reviews.items():
+        if models.ReviewState.REJECTED in review_states:
+            state = models.ReviewState.REJECTED
+        elif models.ReviewState.APPROVED in review_states:
+            state = models.ReviewState.APPROVED
+        else:
+            state = models.ReviewState.PENDING
+        status.reviews.append(
+            models.PullRequestReview(author_login=login, state=state)
+        )
+    status.reviews.sort(key=lambda review: review.author_login)
+    # FIXME: we could remove the author's review (which will appear
+    # if the author commented on their own pull request).
+    return status
+
+
+def _gh_commit_status_to_cogite_commit_state(github_state):
+    # https://docs.github.com/en/graphql/reference/enums#statusstate
     return {
         'ERROR': models.CommitState.ERROR,
-        # FIXME: I don't know what "expected" means here.
-        'EXPECTED': models.CommitState.PENDING,
+        'EXPECTED': models.CommitState.UNKNOWN,
         'FAILURE': models.CommitState.FAILURE,
         'PENDING': models.CommitState.PENDING,
         'SUCCESS': models.CommitState.SUCCESS,
-    }[github_state]
+    }.get(github_state, models.CommitState.UNKNOWN)
 
 
-def _to_cogite_review_state(github_state):
-    # https://docs.github.com/en/free-pro-team@latest/graphql/reference/enums#pullrequestreviewstate
+def _gh_check_run_status_to_cogite_commit_state(status, conclusion):
+    # https://docs.github.com/en/graphql/reference/enums#checkstatusstate
+    if status != 'COMPLETED':
+        return models.CommitState.PENDING
+    # https://docs.github.com/en/graphql/reference/enums#checkconclusionstate
+    return {
+        'ACTION_REQUIRED': models.CommitState.UNKNOWN,
+        'CANCELLED': models.CommitState.FAILURE,
+        'FAILURE': models.CommitState.FAILURE,
+        'NEUTRAL': models.CommitState.UNKNOWN,
+        'SKIPPED': models.CommitState.SUCCESS,
+        'STALE': models.CommitState.UNKNOWN,
+        'STARTUP_FAILURE': models.CommitState.FAILURE,
+        'SUCCESS': models.CommitState.SUCCESS,
+        'TIMED_OUT': models.CommitState.FAILURE,
+    }.get(conclusion, models.CommitState.UNKNOWN)
+
+
+def _gh_review_state_to_cogite_review_state(github_state):
+    # https://docs.github.com/en/graphql/reference/enums#pullrequestreviewstate
     return {
         'APPROVED': models.ReviewState.APPROVED,
         'CHANGES_REQUESTED': models.ReviewState.REJECTED,
+        'COMMENTED': models.ReviewState.COMMENTED,
         # I have never used the "dismiss" feature, I don't know what
         # we should do with this state.
-        'COMMENTED': models.ReviewState.COMMENTED,
-        'DISMISSED': models.ReviewState.REJECTED,
+        'DISMISSED': models.ReviewState.UNKNOWN,
         'PENDING': models.ReviewState.PENDING,
-    }[github_state]
+    }.get(github_state, models.ReviewState.UNKNOWN)
 
 
 class GitHubApiClient(base.BaseClient):
@@ -370,53 +458,7 @@ class GitHubApiClient(base.BaseClient):
             'pullRequestId': self.pull_request.id,
         }
         response = self._post(query, variables)
-        pr_info = response['data']['node']
-        commit_info = pr_info['commits']['nodes'][0]['commit']
-        if not commit_info['status']:
-            return models.PullRequestStatus(sha=commit_info['oid'])
-        contexts = commit_info['status']['contexts']
-        status = models.PullRequestStatus(
-            sha=commit_info['oid'],
-            checks=[
-                models.PullRequestCheck(
-                    name=context['context'],
-                    state=_to_cogite_commit_state(context['state']),
-                    url=context['targetUrl'],
-                )
-                for context in contexts
-            ],
-            reviews=[],
-        )
-        # The 'reviews' nodes in the response only contain reviews
-        # that have been performed. Pending reviews are only available
-        # through the 'reviewRequests' nodes.
-        reviews: Dict[str, List[models.ReviewState]] = collections.defaultdict(list)
-        # GitHub returns a full User object in 'reviewRequests', but
-        # an Author object (with only the login) in 'reviews'. We'll
-        # use the lowest common denominator, i.e. login only.
-        for request in pr_info['reviewRequests']['nodes']:
-            user_reviews = reviews[request['requestedReviewer']['login']]
-            user_reviews.append(models.ReviewState.PENDING)
-        for review in pr_info['reviews']['nodes']:
-            user_reviews = reviews[review['author']['login']]
-            user_reviews.append(_to_cogite_review_state(review['state']))
-        # If a user commented on the pull request and then approved
-        # it, we'll have two reviews. Merge them by keeping the most
-        # relevant state.
-        for login, review_states in reviews.items():
-            if models.ReviewState.REJECTED in review_states:
-                state = models.ReviewState.REJECTED
-            elif models.ReviewState.APPROVED in review_states:
-                state = models.ReviewState.APPROVED
-            else:
-                state = models.ReviewState.PENDING
-            status.reviews.append(
-                models.PullRequestReview(author_login=login, state=state)
-            )
-        status.reviews.sort(key=lambda review: review.author_login)
-        # FIXME: we could remove the author's review (which will appear
-        # if the author commented on their own pull request).
-        return status
+        return _get_pull_request_status(response)
 
 
 class GitHubOAuthDeviceFlowTokenGetter:
