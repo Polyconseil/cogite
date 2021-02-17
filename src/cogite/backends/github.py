@@ -1,8 +1,8 @@
 import collections
 import dataclasses
-import json
 import os
 import pathlib
+import pprint
 import time
 from typing import Dict
 from typing import Iterable
@@ -162,22 +162,16 @@ class GitHubApiClient(base.BaseClient):
         return self._session
 
     def _post(self, query, variables=None):
-        # FIXME: handle errors. At least auth errors.
         data = {'query': query, 'variables': variables or {}}
-        try:
-            response = self.session.post(self.url, json=data)
-        except urllib.error.HTTPError as exc:
-            if exc.code == 422:
-                # FIXME: not all 422 responses have an 'errors'
-                # key. For example, requesting a review of a pull
-                # request by its author yields a 422 with the following response:
-                # {"message": "Review cannot be requested from pull request author.", ...
-                response  = json.loads(exc.fp.read().decode('utf-8'))
-                details = response['errors'][0]['message']
-                err = f'Got HTTP error code {exc.code}: {exc.reason}. Details: {details}'
-                raise errors.FatalError(err) from exc
-            raise
-        return response
+        response = self.session.post(self.url, json=data)
+        if 'errors' in response.data:
+            error = '\n'.join((
+                "Got an error when sending request to GitHub API:",
+                pprint.pformat(response.data['errors']),
+                f"\nThe query was: \n{query}",
+            ))
+            raise errors.FatalError(error)
+        return response.data
 
     @property
     def repository(self):
@@ -275,7 +269,6 @@ class GitHubApiClient(base.BaseClient):
             'userIds': [user.id for user in users],
         }
         self._post(mutation, variables)
-        # FIXME: check response
 
     def get_collaborators(self) -> Iterable[models.User]:
         query = QUERY_REPOSITORY_CONTRIBUTORS
@@ -285,7 +278,6 @@ class GitHubApiClient(base.BaseClient):
             'paginationCursor': None,
         }
         collaborators = []
-        # FIXME: handle errors
         while 1:
             response = self._post(query, variables)
             data = response['data']['repository']['collaborators']

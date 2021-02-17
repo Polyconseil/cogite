@@ -1,5 +1,9 @@
+import dataclasses
+from json import JSONDecodeError
 from json import dumps as json_dumps
 from json import loads as json_loads
+from typing import Optional
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -8,6 +12,13 @@ from cogite.version import VERSION
 
 
 TIMEOUT = 2  # seconds
+
+
+@dataclasses.dataclass
+class Response:
+    status_code: int
+    content: str
+    data: Optional[dict]
 
 
 def send(method, url, query=None, data=None, json=None, headers=None):
@@ -33,6 +44,18 @@ def send(method, url, query=None, data=None, json=None, headers=None):
     )
     try:
         return urllib.request.urlopen(request, timeout=TIMEOUT)
+    except urllib.error.HTTPError as exc:
+        content = exc.file.read().decode('utf-8')
+        try:
+            json = json_loads(content)
+        except (TypeError, JSONDecodeError):
+            json = None
+        error = (
+            f"Got non-OK status code {exc.code} when sending {method} "
+            f"request to {url}.\n"
+            f"Here is the response body: {json or content}"
+        )
+        raise errors.FatalError(error)
     except Exception as exc:
         error = f"Got error when sending {method} request to {url}: {exc}"
         # We could perhaps raise a more specific error (such as
@@ -46,7 +69,7 @@ class Session:
             "Authorization": f"bearer {auth_token}",
         }
 
-    def request(self, method, url, query=None, data=None, json=None):
+    def request(self, method, url, query=None, data=None, json=None) -> Response:
         response = send(
             method,
             url,
@@ -55,15 +78,14 @@ class Session:
             json=json,
             headers=self.headers,
         )
-        # FIXME: should we return the response itself so that the
-        # caller can check the response code? It then should be the
-        # caller's duty to JSON-decode the response. Alternative:
-        # return a custom Response object:
-        # class Response:
-        #   status_code: int
-        #   content: Optional[str]
-        #   data: Optional[dict]
-        return json_loads(response.read())
+        res = Response(
+            status_code=response.status,
+            content=response.read().decode('utf-8'),
+            data=None,
+        )
+        if json:
+            res.data = json_loads(res.content)
+        return res
 
     def get(self, url, query=None):
         return self.request('GET', url, query=query)
