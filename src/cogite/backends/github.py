@@ -52,7 +52,7 @@ def _get_pull_request_status(response: dict) -> models.PullRequestStatus:
             )
             for context in commit_info['status']['contexts']
         ]
-    elif commit_info['checkSuites']:
+    elif commit_info['checkSuites'] and commit_info['checkSuites']['nodes']:
         status.checks = [
             models.PullRequestCheck(
                 name=run['name'],
