@@ -21,6 +21,7 @@ class Configuration:
     master_branch: str = "master"
 
     merge_enable_pre_checks: bool = True
+    merge_auto_rebase: str = "ask"  # could be "always", "ask" or "never"
 
     ci_url: Optional[str] = None
     ci_platform: Optional[str] = None

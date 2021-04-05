@@ -41,6 +41,33 @@ def merge_pull_request(context):
     if not interaction.confirm(defaults_to_yes=False):
         return
 
+    if configuration.merge_auto_rebase != 'always':
+        with spinner.Spinner(
+            "Checking whether the local branch is up-to-date with respect "
+            "to the remote destination branch...",
+            on_success="",
+            on_failure="",
+        ):
+            upstream_head = git.get_upstream_remote_sha(pull_request.destination_branch)
+        if not git.current_branch_has_commit(upstream_head):
+            if configuration.merge_auto_rebase == 'never':
+                print(
+                    f"\033[91m✖\033[0m Latest commit upstream is {upstream_head}, "
+                    f"which you do not have locally. Merge has been cancelled. "
+                    f"You may rebase manually with `cogite pr rebase`."
+                )
+                return
+            print(
+                f"Latest commit upstream is {upstream_head}, which you do not have "
+                f"locally. Do you want to automatically rebase and merge?"
+            )
+            if not interaction.confirm(defaults_to_yes=False):
+                print(
+                    "\033[91m✖\033[0m Merge has been cancelled. "
+                    "You may rebase manually with `cogite pr rebase`"
+                )
+                return
+
     # We'll stop at the first command that fails.
     pr_rebase.rebase_branch(
         context,
