@@ -106,17 +106,13 @@ def _get_pull_request_template():
 
 def _git_push_to_origin(current_branch_name):
     result = shell.run(
-        'git rev-parse --abbrev-ref --symbolic-full-name @{u}', check_ok=False
+        'git rev-parse --abbrev-ref --symbolic-full-name @{u}',
+        expected_returncodes=(0, 128),
     )
     if result.returncode == 128:  # upstream branch is not configured
         command = f'git push --set-upstream origin {current_branch_name}'
-    elif result.returncode == 0:  # upstream branch is already configured
+    else:  # result.returncode == 0:  # upstream branch is already configured
         command = 'git push'
-    else:
-        error = os.linesep.join(result.stderr)
-        raise errors.FatalError(
-            f"Got the following error when pushing upstream:{os.linesep}{error}"
-        )
 
     shell.run(
         command,
