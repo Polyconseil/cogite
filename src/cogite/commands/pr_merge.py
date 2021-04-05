@@ -55,7 +55,7 @@ def merge_pull_request(context):
     run_with_progress(f'git checkout {destination_branch}')
     run_with_progress(f'git rebase {branch}')  # this rebase should not fail
 
-    if configuration.enable_pre_merge_checks and not cogite.checks.pre_merge.check_commits(
+    if configuration.merge_enable_pre_checks and not cogite.checks.pre_merge.check_commits(
         git.get_current_sha(), git.get_remote_branch(), git.get_remote_sha()
     ):
         current_branch = git.get_current_branch()  # get it again (safety belt)
