@@ -20,7 +20,7 @@ class Configuration:
 
     master_branch: str = "master"
 
-    enable_pre_merge_checks: bool = True
+    merge_enable_pre_checks: bool = True
 
     ci_url: Optional[str] = None
     ci_platform: Optional[str] = None
