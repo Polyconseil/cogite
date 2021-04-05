@@ -33,3 +33,5 @@ quality:
 clean:
 	rm -rf .coverage
 	find . -name "*.pyc" | xargs rm -f
+	find . -name "__pycache__" | xargs rm -rf
+	$(MAKE) -C docs clean

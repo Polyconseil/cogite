@@ -36,8 +36,7 @@ sees that the pull/merge request has indeed been merged.
 
 **Cogite** could be extended to use ``git merge`` through a
 configuration option. This is not how the main author uses Git, so
-this feature would need to be an external contribution. Could it be
-yours? ;)
+this feature would need to be an external contribution.
 
 
 Demo
@@ -74,40 +73,13 @@ plugins to extend commands.
 supporting GitHub, GitLab and possibly other Git hosts.
 
 
-Installation
-============
+Installation and getting started
+================================
 
-**Cogite** is written in Python. Python 3.6 or further is
-required. Python 2 is not supported.
+See the `Getting started`_ chapter in the `documentation`_.
 
-You may install **Cogite** with:
-
-.. code-block:: console
-
-    $ pip install cogite
-
-As usual, it is preferable to install in a virtual environment.
-
-
-Getting started
-===============
-
-The instructions below work if your project is hosted on
-GitHub.com. Otherwise, please refer to the `full documentation`_.
-
-1. Move to the directory where you have a checkout of a Git repository.
-
-2. Run ``cogite auth add`` and follow instructions.
-
-That's it, you are ready to use **Cogite**.
-
-
-Further details
-===============
-
-The `full documentation`_ has (a lot) more details about installation,
-configuration options, commands, how to write your own plugins to
-extend **Cogite**, etc.
+.. _Getting started: https://check-oldies.readthedocs.io/en/latest/getting_started.html
+.. _documentation: https://cogite.readthedocs.io
 
 
 License
@@ -117,5 +89,3 @@ License
 3-clause BSD license, a copy of which is included in the source.
 
 .. _Polyconseil: https://opensource.polyconseil.fr
-
-.. _full documentation: https://cogite.readthedocs.io
