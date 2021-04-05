@@ -2,6 +2,7 @@ import dataclasses
 import os
 import re
 import subprocess
+from typing import Iterable
 
 from . import errors
 from . import spinner
@@ -40,6 +41,7 @@ def _run(command: str):
 def run(
     command: str,
     check_ok: bool = True,
+    expected_returncodes: Iterable[int] = (0,),
     progress: str = None,
     on_success: str = None,
     on_failure: str = None,
@@ -52,12 +54,12 @@ def run(
         on_failure = on_failure or progress
         with spinner.Spinner(progress, on_success, on_failure) as sp:
             result = _run(command)
-            if result.returncode == 0:
+            if result.returncode in expected_returncodes:
                 sp.success()
             else:
                 sp.failure()
 
-    if check_ok and result.returncode != 0:
+    if check_ok and result.returncode not in expected_returncodes:
         if result.stderr:
             # XXX: Printing stdout and *then* stderr may not
             # correspond to the order in which the output would have
