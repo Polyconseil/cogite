@@ -29,7 +29,10 @@ class Configuration:
 def read_toml(path: pathlib.Path, section: str = None):
     d = toml.loads(path.read_text())
     if section:
-        return d.get(section, {})
+        for part in section.split('.'):
+            d = d.get(part, {})
+            if not d:
+                return {}
     return d
 
 
