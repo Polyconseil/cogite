@@ -16,9 +16,9 @@ DISPLAY_N_COMMITS = 5  # Don't display too much commits (when merging from/into 
 
 
 def run_command(command):
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
-    process.wait()
-    return b"".join(process.stdout.readlines()).decode(sys.stdout.encoding)
+    with subprocess.Popen(command, shell=True, stdout=subprocess.PIPE) as process:
+        process.wait()
+        return b"".join(process.stdout.readlines()).decode(sys.stdout.encoding)
 
 
 def check_commits(
