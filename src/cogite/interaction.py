@@ -22,11 +22,11 @@ def input_from_file(starting_text=''):
         path = pathlib.Path(tmp.name)
         path.write_text(starting_text)
 
-        process = subprocess.Popen(f"$EDITOR {path}", shell=True)
-        process.wait()
+        with subprocess.Popen(f"$EDITOR {path}", shell=True) as process:
+            process.wait()
 
-        if process.returncode != os.EX_OK:
-            return None
+            if process.returncode != os.EX_OK:
+                return None
 
         return path.read_text()
 
