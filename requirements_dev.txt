@@ -3,7 +3,6 @@
 # Testing
 pytest
 pytest-cov
-types-pkg_resources
 types-toml
 
 # Docs

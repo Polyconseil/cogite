@@ -1,6 +1,11 @@
 import argparse
 
-import pkg_resources
+
+try:
+    import importlib.metadata as importlib_metadata
+except ImportError:
+    # Python < 3.8
+    import importlib_metadata  # type: ignore
 
 
 NAMESPACE_CI_URL_GETTER = 'cogite.plugins.ci_url_getter'
@@ -16,8 +21,8 @@ def get_extra_commands():
 
 
 def _get_plugins(namespace):
-    entry_points = pkg_resources.iter_entry_points(namespace)
-    return [entry_point.resolve() for entry_point in entry_points]
+    entry_points = importlib_metadata.entry_points().get(namespace, ())
+    return [entry_point.load() for entry_point in entry_points]
 
 
 class BaseCiUrlGetter:

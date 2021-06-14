@@ -4,7 +4,11 @@
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-import pkg_resources
+try:
+    import importlib.metadata as importlib_metadata
+except ImportError:
+    # Python < 3.8
+    import importlib_metadata
 
 
 # -- Path setup --------------------------------------------------------------
@@ -23,7 +27,7 @@ project = 'Cogite'
 copyright = '2021, Polyconseil'
 author = 'Polyconseil'
 
-release = pkg_resources.get_distribution("cogite").version
+release = importlib_metadata.version("cogite")
 
 # -- General configuration ---------------------------------------------------
 
