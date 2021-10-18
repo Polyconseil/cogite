@@ -13,30 +13,43 @@ from . import version
 
 
 def get_parser():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description=(
+            'Cogite is a program that helps you create, manage and merge '
+            'pull/merge requests and push upstream from the command line. '
+            'More info at https://cogite.readthedocs.io/'
+        )
+    )
     parser.add_argument(
-        '-v', '--version', action='version', version=f'%%(prog)s {version.VERSION}'
+        '-v', '--version',
+        action='version',
+        version=f'%%(prog)s {version.VERSION}',
     )
 
     # Yo dawg, I'm going to put subparsers in your subparsers.
     main_subparsers = parser.add_subparsers()
 
     # auth (add|delete)
-    auth = main_subparsers.add_parser('auth', help='Commands related to authentication.')
+    auth_help = 'Commands related to authentication'
+    auth = main_subparsers.add_parser('auth', help=auth_help, description=auth_help)
     auth_subparsers = auth.add_subparsers()
-    auth_add = auth_subparsers.add_parser('add', help='Configure authentication.')
+    auth_add_help = 'Interactively configure authentication.'
+    auth_add = auth_subparsers.add_parser('add', help=auth_add_help, description=auth_add_help)
     auth_add.set_defaults(callback=commands.add_auth)
 
     auth_delete = auth_subparsers.add_parser('delete', help='Delete authentication token.')
     auth_delete.set_defaults(callback=commands.delete_auth)
 
     # pr (add|browse|draft|merge|ready|rebase|reqreview)
-    pr = main_subparsers.add_parser('pr', help='Commands related to pull requests.')
+    pr_help = 'Commands related to pull requests'
+    pr = main_subparsers.add_parser('pr', help=pr_help, description=pr_help)
     pr_subparsers = pr.add_subparsers()
 
-    pr_add = pr_subparsers.add_parser('add', help='Add a pull request.')
+    pr_add_help = "Interactively create a new pull/merge request."
+    pr_add = pr_subparsers.add_parser('add', help=pr_add_help, description=pr_add_help)
+    pr_draft_help = "Interactively create a draft pull request."
     pr_draft = pr_subparsers.add_parser(
-        'draft', help='Add a draft pull request (alias to `pr add --draft`).'
+        'draft', help=pr_draft_help, description=pr_draft_help
     )
     for subparser in (pr_add, pr_draft):
         subparser.add_argument(
@@ -55,31 +68,37 @@ def get_parser():
 
     pr_draft.set_defaults(callback=commands.add_draft_pull_request)
 
+    pr_browse_help = 'Open current pull request in a browser.'
     pr_browse = pr_subparsers.add_parser(
-        'browse', help='Browse a pull request on GitHub (defaults to current PR)'
+        'browse', help=pr_browse_help, description=pr_browse_help
     )
     pr_browse.set_defaults(callback=commands.browse_pull_request)
     pr_browse.add_argument('branch', type=str, action='store', nargs='?')
 
+    pr_merge_help = 'Merge (actually rebase and push) a pull request.'
     pr_merge = pr_subparsers.add_parser(
-        'merge', help='Merge (actually rebase and push) a pull request.'
+        'merge', help=pr_merge_help, description=pr_merge_help
     )
     pr_merge.set_defaults(callback=commands.merge_pull_request)
 
+    pr_ready_help = 'Mark a draft pull request as ready.'
     pr_ready = pr_subparsers.add_parser(
-        'ready', help='Mark a draft pull request as ready.'
+        'ready', help=pr_ready_help, description=pr_ready_help
     )
     pr_ready.set_defaults(callback=commands.mark_pull_request_as_ready)
 
-    pr_rebase = pr_subparsers.add_parser('rebase', help='Rebase a pull request.')
+    pr_rebase_help = 'Rebase a pull request.'
+    pr_rebase = pr_subparsers.add_parser('rebase', help=pr_rebase_help, description=pr_rebase_help)
     pr_rebase.set_defaults(callback=commands.rebase_branch)
 
     # FIXME: "reqreview" is long to type, can we find a shorter alias?
-    pr_reqreview = pr_subparsers.add_parser('reqreview', help='Ask for reviews.')
+    pr_reqreview = 'Ask for reviews.'
+    pr_reqreview = pr_subparsers.add_parser('reqreview', help=pr_reqreview, description=pr_reqreview)
     pr_reqreview.set_defaults(callback=commands.request_reviews)
 
     # ci (browse)
-    ci = main_subparsers.add_parser('ci', help='Commands related to CI.')
+    ci_help = 'Commands related to CI.'
+    ci = main_subparsers.add_parser('ci', help=ci_help, description=ci_help)
     ci_subparsers = ci.add_subparsers()
 
     ci_browse = ci_subparsers.add_parser(
@@ -89,8 +108,9 @@ def get_parser():
     ci_browse.add_argument('branch', type=str, action='store', nargs='?')
 
     # status (no sub-commands)
+    status_help = 'Show status of the pull request.'
     status = main_subparsers.add_parser(
-        'status', help='Show status of the pull request (defauls to current branch)'
+        'status', help=status_help, description=status_help
     )
     status.set_defaults(callback=commands.show_status)
     status.add_argument(
