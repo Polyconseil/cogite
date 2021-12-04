@@ -41,19 +41,20 @@ def _get_pull_request_status(response: dict) -> models.PullRequestStatus:
     commit_info = pr_info['commits']['nodes'][0]['commit']
     status = models.PullRequestStatus(sha=commit_info['oid'])
 
-    # Depending on the CI configuration, we end up with either commit
-    # statuses or checks. Look at both.
+    # Depending on the CI configuration, we may end up with either
+    # commit statuses and/or checks. Look at both.
+    status.checks = []
     if commit_info['status']:
-        status.checks = [
+        status.checks.extend([
             models.PullRequestCheck(
                 name=context['context'],
                 state=_gh_commit_status_to_cogite_commit_state(context['state']),
                 url=context['targetUrl'],
             )
             for context in commit_info['status']['contexts']
-        ]
-    elif commit_info['checkSuites'] and commit_info['checkSuites']['nodes']:
-        status.checks = [
+        ])
+    if commit_info['checkSuites'] and commit_info['checkSuites']['nodes']:
+        status.checks.extend([
             models.PullRequestCheck(
                 name=run['name'],
                 state=_gh_check_run_status_to_cogite_commit_state(
@@ -62,7 +63,7 @@ def _get_pull_request_status(response: dict) -> models.PullRequestStatus:
                 url=run['permalink'],
             )
             for run in commit_info['checkSuites']['nodes'][0]['checkRuns']['nodes']
-        ]
+        ])
 
     # The 'reviews' nodes in the response only contain reviews
     # that have been performed. Pending reviews are only available
@@ -96,7 +97,7 @@ def _get_pull_request_status(response: dict) -> models.PullRequestStatus:
     return status
 
 
-def _gh_commit_status_to_cogite_commit_state(github_state):
+def _gh_commit_status_to_cogite_commit_state(github_state: str) -> models.CommitState:
     # https://docs.github.com/en/graphql/reference/enums#statusstate
     return {
         'ERROR': models.CommitState.ERROR,
@@ -107,7 +108,7 @@ def _gh_commit_status_to_cogite_commit_state(github_state):
     }.get(github_state, models.CommitState.UNKNOWN)
 
 
-def _gh_check_run_status_to_cogite_commit_state(status, conclusion):
+def _gh_check_run_status_to_cogite_commit_state(status: str, conclusion: str) -> models.CommitState:
     # https://docs.github.com/en/graphql/reference/enums#checkstatusstate
     if status != 'COMPLETED':
         return models.CommitState.PENDING
@@ -125,7 +126,7 @@ def _gh_check_run_status_to_cogite_commit_state(status, conclusion):
     }.get(conclusion, models.CommitState.UNKNOWN)
 
 
-def _gh_review_state_to_cogite_review_state(github_state):
+def _gh_review_state_to_cogite_review_state(github_state: str) -> models.ReviewState:
     # https://docs.github.com/en/graphql/reference/enums#pullrequestreviewstate
     return {
         'APPROVED': models.ReviewState.APPROVED,
@@ -367,7 +368,7 @@ class GitHubOAuthDeviceFlowTokenGetter:
                         "on GitHub? Please try again."
                     )
 
-    def _get_verification_info(self):
+    def _get_verification_info(self) -> VerificationInfo:
         """Request a verification code from GitHub."""
         # Get verification code from GitHub.
         response = requests.send(
