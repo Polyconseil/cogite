@@ -91,7 +91,8 @@ def _get_pull_request_template():
     template_file_paths = [
         os.sep.join(path_parts).lstrip(os.path.sep)
         for path_parts in itertools.product(
-            ['', '.github'], ['PULL_REQUEST_TEMPLATE.md']
+            ['', '.github'],
+            ['PULL_REQUEST_TEMPLATE.md', 'pull_request_template.md'],
         )
     ]
 
