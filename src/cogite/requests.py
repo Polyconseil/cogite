@@ -43,7 +43,6 @@ def send(method, url, query=None, data=None, json=None, headers=None):
         method=method,
     )
     try:
-        # pylint: disable=consider-using-with
         return urllib.request.urlopen(request, timeout=TIMEOUT)
     except urllib.error.HTTPError as exc:
         content = exc.file.read().decode('utf-8')

@@ -20,7 +20,7 @@ def input_from_file(starting_text=''):
     """
     with tempfile.NamedTemporaryFile('w+') as tmp:
         path = pathlib.Path(tmp.name)
-        path.write_text(starting_text)
+        path.write_text(starting_text, encoding="utf-8")
 
         with subprocess.Popen(f"$EDITOR {path}", shell=True) as process:
             process.wait()
@@ -28,7 +28,7 @@ def input_from_file(starting_text=''):
             if process.returncode != os.EX_OK:
                 return None
 
-        return path.read_text()
+        return path.read_text(encoding="utf-8")
 
 
 def confirm(defaults_to_yes, with_edit_choice=False):
