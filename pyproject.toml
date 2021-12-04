@@ -29,9 +29,7 @@ enable = [
 ]
 
 disable = [
-    "arguments-differ",
     "attribute-defined-outside-init",
-    "bad-continuation",
     "consider-using-f-string",
     "cyclic-import",
     "duplicate-code",
@@ -45,10 +43,7 @@ disable = [
     "no-init",
     "no-member",
     "no-self-use",
-    "old-style-class",
     "protected-access",
-    "redefined-variable-type",
-    "superfluous-parens",
     "too-few-public-methods",
     "too-many-ancestors",
     "too-many-arguments",
@@ -60,6 +55,5 @@ disable = [
     "too-many-statements",
     "ungrouped-imports",
     "unused-argument",
-    "useless-return",
     "wrong-import-order",
 ]
