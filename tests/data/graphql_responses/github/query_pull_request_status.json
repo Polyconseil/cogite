@@ -1,0 +1,1 @@
+{"data":{"node":{"commits":{"nodes":[{"commit":{"oid":"b04e404e1715fe9ac60bd53643264df3f0dfcb67","checkSuites":{"nodes":[{"checkRuns":{"nodes":[{"conclusion":"SUCCESS","name":"test","permalink":"https://github.com/dbaty/sandbox/runs/4424135611?check_suite_focus=true","status":"COMPLETED"}]}}]},"status":null}}]},"reviewRequests":{"nodes":[]},"reviews":{"nodes":[]}}}}

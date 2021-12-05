@@ -1,0 +1,24 @@
+# See `generate.py` for further details.
+
+["github/query_repository"]
+variables = { owner = "dbaty", repositoryName = "sandbox" }
+extract = { repositoryId = "data.repository.id" }
+
+["github/query_repository_contributors"]
+variables = { owner = "dbaty", repositoryName = "sandbox" }
+
+["github/mutation_create_pull_request"]
+variables =  { repositoryId = "$repositoryId", headRefName = "dbaty/eternal-branch-for-cogite-development", baseRefName = "master", body = "", title = "Update README", draft = false }
+extract = { pullRequestId = "data.createPullRequest.pullRequest.id" }
+
+["github/mutation_mark_as_ready"]
+variables = { pullRequestId = "$pullRequestId" }
+
+["github/mutation_request_reviews"]
+variables = { pullRequestId = "$pullRequestId", userIds = ["MDQ6VXNlcjQ3MTMyMQ=="] }
+
+["github/query_pull_request"]
+variables = { owner = "dbaty", repositoryName = "sandbox", headRefName = "dbaty/eternal-branch-for-cogite-development" }
+
+["github/query_pull_request_status"]
+variables = { pullRequestId = "$pullRequestId" }
