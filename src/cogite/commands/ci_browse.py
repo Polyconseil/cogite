@@ -1,7 +1,9 @@
 import pathlib
+from typing import Optional
 import webbrowser
 
 from cogite import errors
+from cogite import git
 from cogite import plugins
 
 
@@ -12,11 +14,11 @@ CI_PLATFORM_URL = {
 
 
 
-def _detect_platform():
+def _detect_platform(directory: pathlib.Path) -> Optional[str]:
     """Try to detect CI platform."""
-    if pathlib.Path('.circleci').exists():
+    if (directory / '.circleci').exists():
         return 'circleci'
-    if pathlib.Path('.github/workflows').exists():
+    if (directory / '.github/workflows').exists():
         return 'github'
     return None
 
@@ -26,7 +28,10 @@ def _get_ci_url(context, branch):
         return context.configuration.ci_url
     platform = context.configuration.ci_platform
     if not platform:
-        platform = _detect_platform()
+        for path in (pathlib.Path("."), git.get_git_root()):
+            platform = _detect_platform(path)
+            if platform:
+                break
     if platform:
         return CI_PLATFORM_URL[platform]
     for getter in plugins.get_ci_url_getters():
