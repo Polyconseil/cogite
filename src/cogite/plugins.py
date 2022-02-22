@@ -21,7 +21,14 @@ def get_extra_commands():
 
 
 def _get_plugins(namespace):
-    entry_points = importlib_metadata.entry_points().get(namespace, ())
+    entry_points = importlib_metadata.entry_points()
+    # `select()` appeared in Python 3.10. It is _not_ available in 3.8
+    # and 3.9. However, it _is_ available in importlib_metadata (used
+    # here if Python < 3.8).
+    if hasattr(entry_points, 'select'):
+        entry_points = entry_points.select(group=namespace)
+    else:
+        entry_points = entry_points.get(namespace, ())
     return [entry_point.load() for entry_point in entry_points]
 
 
