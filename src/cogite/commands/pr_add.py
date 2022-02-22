@@ -1,6 +1,5 @@
 import itertools
 import os
-import pathlib
 
 from cogite import completion
 from cogite import errors
@@ -96,7 +95,7 @@ def _get_pull_request_template():
         )
     ]
 
-    git_root = pathlib.Path(git.get_git_root())
+    git_root = git.get_git_root()
     for file_path in template_file_paths:
         path = git_root / file_path
         if path.exists():

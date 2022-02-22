@@ -1,12 +1,13 @@
 import os
+import pathlib
 import re
 
 from . import errors
 from . import shell
 
 
-def get_git_root():
-    return shell.run("git rev-parse --show-toplevel").stdout[0]
+def get_git_root() -> pathlib.Path:
+    return pathlib.Path(shell.run("git rev-parse --show-toplevel").stdout[0])
 
 
 def get_current_branch():
