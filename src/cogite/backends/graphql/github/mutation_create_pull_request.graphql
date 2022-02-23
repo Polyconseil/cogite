@@ -1,4 +1,4 @@
-mutation (
+mutation createPullRequest (
   $repositoryId: ID!,
   $headRefName: String!,
   $baseRefName: String!,

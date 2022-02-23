@@ -1,4 +1,4 @@
-query getPullRequest(
+query pullRequest (
   $owner: String!, $repositoryName: String!, $headRefName: String!
 ) {
   repository(owner: $owner, name: $repositoryName) {

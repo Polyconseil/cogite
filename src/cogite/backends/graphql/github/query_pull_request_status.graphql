@@ -1,4 +1,4 @@
-query getPullRequestStatus(
+query pullRequestStatus (
    $pullRequestId: ID!,
 ) {
   node(id: $pullRequestId ) {

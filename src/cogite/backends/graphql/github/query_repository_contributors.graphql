@@ -1,4 +1,4 @@
-query getRepositoryId(
+query repositoryContributors (
   $owner: String!, $repositoryName: String!, $paginationCursor: String
 ) {
   repository(owner: $owner, name: $repositoryName) {

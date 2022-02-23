@@ -1,4 +1,4 @@
-mutation ($pullRequestId: ID!) {
+mutation markAsReady ($pullRequestId: ID!) {
   markPullRequestReadyForReview(input: {pullRequestId: $pullRequestId})
   {
     clientMutationId,

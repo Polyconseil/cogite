@@ -1,4 +1,4 @@
-mutation (
+mutation requestReviews (
   $pullRequestId: String!,
   $userIds: [ID!],
 ) {
