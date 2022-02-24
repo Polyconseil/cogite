@@ -23,7 +23,7 @@ docs:
 quality:
 	isort --check-only --diff .
 	pylint --reports=no --score=no setup.py src/cogite tests
-	mypy src/cogite
+	mypy src/cogite tests
 	check-branches
 	check-fixmes
 	check-manifest
