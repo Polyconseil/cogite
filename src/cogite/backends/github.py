@@ -175,9 +175,10 @@ class GitHubApiClient(base.BaseClient):
         return response.data
 
     @property
-    def repository(self):
+    def repository(self) -> dict:
         if hasattr(self, '_repository'):
             return self._repository  # pylint: disable=access-member-before-definition
+        self._repository: dict = {}  # make mypy happy
         cache_key = self.context.remote_url
         cached = cache.get(cache_key)
         if cached is not cache.NOT_SET:
@@ -188,7 +189,7 @@ class GitHubApiClient(base.BaseClient):
         self._repository = repository
         return repository
 
-    def _get_repository_from_host(self):
+    def _get_repository_from_host(self) -> dict:
         query = QUERY_REPOSITORY
         variables = {
             'owner': self.owner,
