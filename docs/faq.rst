@@ -25,10 +25,8 @@ tool that's great". Really, I don't mind.
 Merge strategy is superior to rebase and you MUST implement it
 --------------------------------------------------------------
 
-Is is it superior, really? `"Yeah, well, you know, that's just, like,
-your opinion." <https://www.youtube.com/watch?v=pWdd6_ZxX8c>`_
-
-Must I implement it? Nope, I *must* not.
+`"Yeah, well, you know, that's just, like, your opinion."
+<https://www.youtube.com/watch?v=pWdd6_ZxX8c>`_
 
 
 Did you not think of tag lines?
