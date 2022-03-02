@@ -1,3 +1,4 @@
+from cogite import interaction
 from cogite import shell
 
 from . import helpers
@@ -26,6 +27,6 @@ def rebase_branch(context, *, print_success=True, rebase_from=MASTER_BRANCH):
         shell.run(command=command, progress=command)
 
     if print_success:
-        print(
-            f"\033[92m✔\033[0m Your branch has been rebased wrt upstream {rebase_from}."
+        interaction.display(
+            f"[[success]] Your branch has been rebased wrt upstream {rebase_from}."
         )

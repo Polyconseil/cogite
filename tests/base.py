@@ -1,6 +1,8 @@
+import contextlib
 import json
 import os
 import pathlib
+import sys
 from unittest import mock
 
 import cogite.cache
@@ -33,3 +35,16 @@ def disable_disk_cache(test_function):
         ):
             test_function(*args, **kwargs)
     return wrapper
+
+
+@contextlib.contextmanager
+def fake_tty():
+    # Temporarily monkey patches stdout to make it look like a tty.
+    # This is necessary when running tests under GitHub Actions, where
+    # stdout is not a tty (https://github.com/actions/runner/issues/241).
+    orig_isatty = sys.stdout.isatty
+    sys.stdout.isatty = lambda: True
+    try:
+        yield
+    finally:
+        sys.stdout.isatty = orig_isatty

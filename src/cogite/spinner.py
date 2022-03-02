@@ -1,5 +1,7 @@
 import yaspin  # type: ignore
 
+from cogite import interaction
+
 
 class Spinner:
     def __init__(self, progress, on_success, on_failure):
@@ -9,11 +11,11 @@ class Spinner:
 
     def success(self):
         self._spinner.text = self.on_success
-        self._spinner.ok('\033[92m✔\033[0m')
+        self._spinner.ok(interaction.interpret_rich_text('[[success]]'))
 
     def failure(self):
         self._spinner.text = self.on_failure
-        self._spinner.fail('\033[91m✖\033[0m')
+        self._spinner.fail(interaction.interpret_rich_text('[[error]]'))
 
     def __enter__(self):
         self._spinner = yaspin.yaspin(text=self.progress).__enter__()
@@ -27,7 +29,7 @@ class Spinner:
 
 def get_for_git_host_call():
     return Spinner(
-        'Requesting Git host API...',
-        'Got response from Git host API',
-        'Got error from Git host API',
+        progress='Requesting Git host API...',
+        on_success='Got response from Git host API',
+        on_failure='Got error from Git host API',
     )

@@ -35,6 +35,8 @@ def add_pull_request(context, *, base_branch, draft=False):
         filter(None, [commits_text, _get_pull_request_template()])
     ).strip()
 
+    # Do not use `interaction.display()` here: `content` should be
+    # displayed as is.
     print(os.linesep.join((
         'Confirm title and body:',
         '--- 8-> ---',
@@ -83,7 +85,7 @@ def add_pull_request(context, *, base_branch, draft=False):
             except errors.GitHostError as exc:
                 raise errors.FatalError(str(exc)) from exc
 
-    print(f"Created #{pr.number} at {pr.url}")
+    interaction.display(f"[[success]] Created #{pr.number} at {pr.url}")
 
 
 def _get_pull_request_template():

@@ -15,6 +15,7 @@ import webbrowser
 from cogite import auth
 from cogite import cache
 from cogite import errors
+from cogite import interaction
 from cogite import models
 from cogite import requests
 from cogite import spinner
@@ -337,7 +338,7 @@ class GitHubOAuthDeviceFlowTokenGetter:
         verification_info = self._get_verification_info()
         self.interval = verification_info.interval
 
-        print(f"1. Copy your one-time verification code: {verification_info.user_code}")
+        interaction.display(f"1. Copy your one-time verification code: {verification_info.user_code}")
         input(
             "2. Then press Enter to open github.com in your browser "
             "and fill the form with this code..."

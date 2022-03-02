@@ -64,10 +64,10 @@ def run(
             # XXX: Printing stdout and *then* stderr may not
             # correspond to the order in which the output would have
             # appeared if we had not captured it.
-            err = f"Got the following output when running `{command}`:{os.linesep}"
+            err = f"[[error]] Got the following output when running `{command}`:{os.linesep}"
             err += os.linesep.join(result.stdout + result.stderr)
         else:
-            err = f"Got an empty error when running `{command}`."
+            err = f"[[error]] Got an empty error when running `{command}`."
         raise errors.FatalError(err)
 
     return result

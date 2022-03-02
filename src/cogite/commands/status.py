@@ -3,6 +3,7 @@ import time
 
 from cogite import errors
 from cogite import git
+from cogite import interaction
 from cogite import models
 from cogite import spinner
 
@@ -36,7 +37,10 @@ def show_status(context, poll=False):
                 if not status.checks:
                     screen.addstr(2, 0, "No check yet.")
                 for i, check in enumerate(status.checks):
-                    line = '{} {} {}'.format(_marker(check.state, with_color=False), check.name, check.url)
+                    line = interaction.interpret_rich_text(
+                        f"{_symbol_for_state(check.state)} {check.name} — {check.url}",
+                        context=interaction.OutputContext.CURSES,
+                    )
                     screen.addstr(
                         2 + i, 0, line, curses.color_pair(_curses_color(check.state))
                     )
@@ -54,61 +58,52 @@ def show_status(context, poll=False):
         with spinner.get_for_git_host_call():
             status = client.get_pull_request_status()
 
-    _show_check_state(status)
     # Always print the statuses. When we poll and quit the loop
-    # because the Jenkins job is complete, the (curses) screen is
+    # because the CI job is complete, the (curses) screen is
     # reset so the information disappears.
+    _show_check_state(status)
     if status.reviews:
-        print("Reviews:")
+        interaction.display("Reviews:")
         for review in status.reviews:
-            print(f"  {_marker(review.state)} {review.author_login}")
+            interaction.display(
+                f"  {_symbol_for_state(review.state)} {review.author_login}"
+            )
     else:
-        print("\033[91m✖\033[0m Found no request for review.")
+        interaction.display("[[warning]] Found no request for review.")
     if status.sha != git.get_current_sha():
-        # FIXME: print in red
-        print(
-            "Warning: your branch is ahead of upstream. "
-            "The status above does not correspond to your latest local commit."
+        interaction.display(
+            "[[warning]] Your branch is ahead of upstream. "
+            "[[caution]]The status above does not correspond to your latest local commit.[[/]]"
         )
 
 
 def _show_check_state(status):
     if status.checks:
-        print("Checks:")
+        interaction.display("Checks:")
         for check in status.checks:
-            print(f"  {_marker(check.state)} {check.name} ({check.url})")
+            interaction.display(
+                f"  {_symbol_for_state(check.state)} {check.name} — {check.url}"
+            )
     else:
-        print("\033[91m✖\033[0m Found no check.")
+        interaction.display("[[errorr] Found no check.")
 
 
-# FIXME: we should have a more central way of associating states,
-# characters ("✔", "✖", etc.), control characters for colors on the
-# terminal and curses color. See `_curses_color()` below, too.
-def _marker(state, with_color=True):
+def _symbol_for_state(state) -> str:
     if state in (
         models.CommitState.ERROR,
         models.CommitState.FAILURE,
         models.ReviewState.REJECTED,
     ):
-        char = "✖"
-        colorized = f"\033[91m{char}\033[0m"  # red
-    elif state in (models.CommitState.SUCCESS, models.ReviewState.APPROVED):
-        char = "✔"
-        colorized = f"\033[92m{char}\033[0m"  # green
-    elif state == models.ReviewState.COMMENTED:
-        char = "?"
-        colorized = f"\033[93m{char}\033[0m"  # yellow
-    elif state in (models.CommitState.PENDING, models.ReviewState.PENDING):
-        char = "…"
-        colorized = f"\033[96m{char}\033[0m"  # cyan
-    else:
-        raise ValueError(f"Unexpected state: {state}")
-    if not with_color:
-        return char
-    return colorized
+        return interaction.StatusSymbol.ERROR.value
+    if state in (models.CommitState.SUCCESS, models.ReviewState.APPROVED):
+        return interaction.StatusSymbol.SUCCESS.value
+    if state == models.ReviewState.COMMENTED:
+        return interaction.StatusSymbol.QUESTION.value
+    if state in (models.CommitState.PENDING, models.ReviewState.PENDING):
+        return interaction.StatusSymbol.PENDING.value
+    raise ValueError(f"Unexpected state: {state}")
 
 
-# FIXME: see comment above about `_marker()`.
 def _curses_color(state):
     if state == models.CommitState.SUCCESS:
         return curses.COLOR_GREEN

@@ -36,16 +36,16 @@ def check_commits(
     if n_commits >= MAX_COMMITS:
         if n_commits > display_n_commits:
             msg = (
-                f"⚠ You are about to push {n_commits} commits to {branch} "
+                f"[[warning]] You are about to push {n_commits} commits to {branch} "
                 f"(only {display_n_commits} are displayed below):"
             )
         else:
-            msg = f"⚠ You are about to push these {n_commits} commits to {branch}:"
-        print(f"{os.linesep}{msg}")
+            msg = f"[[warning]] You are about to push these {n_commits} commits to {branch}:"
+        interaction.display(f"{os.linesep}{msg}")
 
         n_to_display = min(n_commits, display_n_commits)
-        print(run_command(f'git log --pretty="%h %s" -n {n_to_display} {commit_range}'))
-        print("Perhaps you have forgotten to squash them.")
+        interaction.display(run_command(f'git log --pretty="%h %s" -n {n_to_display} {commit_range}'))
+        interaction.display("Perhaps you have forgotten to squash them.")
         if not interaction.confirm(defaults_to_yes=False):
             return False
 
@@ -56,12 +56,12 @@ def check_commits(
         command += f" --grep {keyword}"
     squashable_commits = run_command(command)
     if squashable_commits:
-        print(
-            f"⚠ You are about to push commits to {branch} that look like "
+        interaction.display(
+            f"[[warning]] You are about to push commits to {branch} that look like "
             "squashable or work-in-progress commits:"
         )
-        print(squashable_commits)
-        print(f"{os.linesep}Perhaps you have forgotten to squash them.")
+        interaction.display(squashable_commits)
+        interaction.display(f"{os.linesep}Perhaps you have forgotten to squash them.")
         if not interaction.confirm(defaults_to_yes=False):
             return False
 

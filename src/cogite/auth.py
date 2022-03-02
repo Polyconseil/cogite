@@ -2,6 +2,7 @@ import getpass
 
 from cogite import backends
 from cogite import config
+from cogite import interaction
 
 
 AUTH_TOKEN_DIR = config.COGITE_CONFIG_DIR / "auth"
@@ -38,7 +39,7 @@ def delete_token(host_domain):
 
 class UserInputTokenGetter:
     def get_token(self):
-        print(
+        interaction.display(
             "You must have an existing personal access token, "
             "for which the `repo` scope has been granted."
         )

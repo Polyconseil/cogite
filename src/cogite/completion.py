@@ -4,6 +4,7 @@ from typing import List
 import prompt_toolkit
 import prompt_toolkit.completion
 
+from cogite import interaction
 from cogite import models
 
 
@@ -42,7 +43,7 @@ def prompt_for_users(users: List[models.User]):
             return [by_login[login] for login in USER_REGEXP.findall(response)]
         except KeyError as exc:
             login = exc.args[0]
-            print(
-                f"Could not find user '{login}'. "
+            interaction.display(
+                f"[[error]] Could not find user '{login}'. "
                 f"Make you sure that you use a space to separate reviewers."
             )
