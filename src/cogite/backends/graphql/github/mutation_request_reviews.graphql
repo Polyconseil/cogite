@@ -1,5 +1,5 @@
 mutation requestReviews (
-  $pullRequestId: String!,
+  $pullRequestId: ID!,
   $userIds: [ID!],
 ) {
   requestReviews(input: {
