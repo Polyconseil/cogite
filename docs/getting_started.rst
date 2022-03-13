@@ -1,7 +1,7 @@
 Getting started
 ===============
 
-You must have Python 3.6 or later, and a relatively recent version of
+You must have Python 3.7 or later, and a relatively recent version of
 Git. Git 2.30 is known to work, but older versions will most likely
 work as well.
 
