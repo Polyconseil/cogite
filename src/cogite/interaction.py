@@ -27,6 +27,7 @@ class StatusSymbol(enum.Enum):
     ERROR = "[[red]]✖[[/]]"
     PENDING = "[[cyan]]…[[/]]"
     QUESTION = "[[yellow]]?[[/]]"
+    QUOTATION = "[[grey]]|[[/]]"
 
 
 class Style(enum.Enum):
@@ -36,6 +37,7 @@ class Style(enum.Enum):
 
     CYAN = "cyan"
     GREEN = "green"
+    GREY = "grey"
     RED = "red"
     YELLOW = "yellow"
 
@@ -47,6 +49,7 @@ ANSI_ESCAPE_CODES = {
 
     Style.CYAN: "\033[96m",
     Style.GREEN: "\033[92m",
+    Style.GREY: "\033[90m",
     Style.RED: "\033[91m",
     Style.YELLOW: "\033[93m",
 }
@@ -155,3 +158,17 @@ def interpret_rich_text(text: str, context: OutputContext = OutputContext.STANDA
 def display(rich_text: str):
     """Interpret rich text and print it."""
     print(interpret_rich_text(rich_text))
+
+
+def quote(content: str, context: OutputContext = OutputContext.STANDARD) -> str:
+    """Return **already-interpreted** text that has each line of
+    ``content`` quoted.
+
+    The result should be used directly with `print()` (and not
+    ``interaction.display()``if you do not wish to interpret what's in
+    ``content``.
+    """
+    return "\n".join(
+        interpret_rich_text("[[quotation]] ", context) + line
+        for line in content.split("\n")
+    )

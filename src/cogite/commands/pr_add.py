@@ -35,14 +35,10 @@ def add_pull_request(context, *, base_branch, draft=False):
         filter(None, [commits_text, _get_pull_request_template()])
     ).strip()
 
+    interaction.display('Confirm title and body:')
     # Do not use `interaction.display()` here: `content` should be
     # displayed as is.
-    print(os.linesep.join((
-        'Confirm title and body:',
-        '--- 8-> ---',
-        content,
-        '--- 8-> ---',
-    )))
+    print(interaction.quote(content))
     confirmed = interaction.confirm(defaults_to_yes=True, with_edit_choice=True)
     if not confirmed:
         return

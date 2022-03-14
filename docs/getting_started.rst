@@ -59,9 +59,7 @@ Here we describe how to use **Cogite** in a feature branch workflow
        cogite pr add
        ✔ Pushed local branch to upstream.
        Confirm title and body:
-       --- 8-> ---
-       Update README
-       --- 8-> ---
+       | Update README
        Continue [Y/e/n]?
        ✔ Created pull request on Git host
        Reviewers (leave blank if none, tab to complete, space to select, enter to validate):
