@@ -12,7 +12,7 @@ from cogite import interaction
 
 # If the user pushes MAX_COMMITS or more, ask for confirmation.
 MAX_COMMITS = 2
-DISPLAY_N_COMMITS = 5  # Don't display too much commits (when merging from/into prod).
+DISPLAY_N_COMMITS = 5  # Don't display too much commits
 
 
 def run_command(command):
