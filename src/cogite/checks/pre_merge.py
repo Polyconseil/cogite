@@ -33,7 +33,7 @@ def check_commits(
 
     commit_range = f"{remote_sha}..{local_sha}"
     n_commits = int(run_command(f"git rev-list {commit_range} | wc -l"))
-    if n_commits >= MAX_COMMITS:
+    if n_commits >= max_commits:
         if n_commits > display_n_commits:
             msg = (
                 f"[[warning]] You are about to push {n_commits} commits to {branch} "
