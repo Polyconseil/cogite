@@ -36,3 +36,11 @@ Conflict resolution
 -------------------
 
 FIXME
+
+
+.. _shell_completion:
+
+Shell completion
+----------------
+
+FIXME: document ZSH completion

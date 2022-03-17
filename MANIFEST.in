@@ -7,6 +7,7 @@ include README.rst
 graft src/cogite
 
 prune docs
+prune extra
 prune tests
 exclude .pylintrc
 exclude .readthedocs.yaml
