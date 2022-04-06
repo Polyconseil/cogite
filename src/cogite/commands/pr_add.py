@@ -3,6 +3,7 @@ import os
 import typing
 
 from cogite import completion
+from cogite import context
 from cogite import errors
 from cogite import git
 from cogite import interaction
@@ -12,23 +13,23 @@ from cogite import spinner
 from . import helpers
 
 
-def add_draft_pull_request(context, **kwargs):
-    return add_pull_request(context, draft=True, **kwargs)
+def add_draft_pull_request(ctx: context.Context, **kwargs):
+    return add_pull_request(ctx, draft=True, **kwargs)
 
 
-def add_pull_request(context, *, base_branch, draft=False):
-    client = context.client
-    configuration = context.configuration
+def add_pull_request(ctx: context.Context, *, base_branch: str, draft: bool=False):
+    client = ctx.client
+    configuration = ctx.configuration
     base_branch = base_branch or configuration.master_branch
 
-    helpers.assert_current_branch_is_feature_branch(context.branch, configuration.master_branch)
+    helpers.assert_current_branch_is_feature_branch(ctx.branch, configuration.master_branch)
 
-    _git_push_to_origin(context.branch)
+    _git_push_to_origin(ctx.branch)
 
     commits_text = os.linesep.join(
         itertools.chain.from_iterable(
             (commit, '', '')
-            for commit in git.get_commits_logs(base_branch, context.branch)
+            for commit in git.get_commits_logs(base_branch, ctx.branch)
         )
     )
 
@@ -64,7 +65,7 @@ def add_pull_request(context, *, base_branch, draft=False):
     ) as sp:
         try:
             pr = client.create_pull_request(
-                head=context.branch,
+                head=ctx.branch,
                 base=base_branch,
                 title=title.strip(),
                 body=body.strip(),

@@ -2,6 +2,8 @@ import dataclasses
 import re
 import urllib.parse
 
+from cogite import backends
+from cogite import config
 from cogite import errors
 from cogite import git
 
@@ -18,8 +20,8 @@ class Context:
     branch: str
 
     # Injected from `cli._main()`
-    client = None
-    configuration = None
+    client: backends.BaseClient
+    configuration: config.Configuration
 
     def as_dict(self):
         return dict(self.__dict__)  # copy, except for `client` and `configuration`
@@ -54,4 +56,10 @@ def get_context() -> Context:
         owner=owner,
         repository=repository,
         branch=git.get_current_branch(),
+        # `client` and `configuration` will be overriden with proper
+        # values in `cli._main()`. We provide dummy values to avoid
+        # having to set `Context.client` and `Context.configuration`
+        # as Optional, because they are not.
+        client="dummy",  # type: ignore[arg-type]
+        configuration="dummy",  # type: ignore[arg-type]
     )

@@ -1,5 +1,5 @@
 import re
-from typing import List
+from typing import Iterable
 
 import prompt_toolkit
 import prompt_toolkit.completion
@@ -13,7 +13,7 @@ USER_REGEXP = re.compile(r" *(?P<login>[^\(]+?) \([^\)]*?\)")
 
 
 class UserCompleter(prompt_toolkit.completion.Completer):
-    def __init__(self, users: List[models.User]):
+    def __init__(self, users: Iterable[models.User]):
         self.users = users
 
     def get_completions(self, document, complete_event):
@@ -28,7 +28,7 @@ class UserCompleter(prompt_toolkit.completion.Completer):
                 )
 
 
-def prompt_for_users(users: List[models.User]):
+def prompt_for_users(users: Iterable[models.User]):
     while True:
         completer = UserCompleter(users)
         response = prompt_toolkit.prompt(

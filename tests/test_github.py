@@ -30,6 +30,8 @@ def _make_client():
         owner="dummy_owner",
         repository="dummy_repository",
         branch="dummy_branch",
+        client="dummy",
+        configuration="dummy",
     )
     return github.GitHubApiClient(configuration, ctx)
 
