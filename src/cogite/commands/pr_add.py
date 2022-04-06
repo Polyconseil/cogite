@@ -1,5 +1,6 @@
 import itertools
 import os
+import typing
 
 from cogite import completion
 from cogite import errors
@@ -31,17 +32,22 @@ def add_pull_request(context, *, base_branch, draft=False):
         )
     )
 
+    pull_request_template = _get_pull_request_template()
     content = os.linesep.join(
-        filter(None, [commits_text, _get_pull_request_template()])
+        filter(None, [commits_text, pull_request_template])
     ).strip()
 
-    interaction.display('Confirm title and body:')
-    # Do not use `interaction.display()` here: `content` should be
-    # displayed as is.
-    print(interaction.quote(content))
-    confirmed = interaction.confirm(defaults_to_yes=True, with_edit_choice=True)
-    if not confirmed:
-        return
+    if pull_request_template:
+        # If there is a template, the user certainly wants to edit it.
+        confirmed = interaction.EDIT
+    else:
+        interaction.display('Confirm title and body:')
+        # Do not use `interaction.display()` below: `content` should
+        # be displayed as is.
+        print(interaction.quote(content))
+        confirmed = interaction.confirm(defaults_to_yes=True, with_edit_choice=True)
+        if not confirmed:
+            return
     if confirmed is interaction.EDIT:
         content = interaction.input_from_file(starting_text=content) or content
 
@@ -84,7 +90,10 @@ def add_pull_request(context, *, base_branch, draft=False):
     interaction.display(f"[[success]] Created #{pr.number} at {pr.url}")
 
 
-def _get_pull_request_template():
+def _get_pull_request_template() -> typing.Optional[str]:
+    """Return the contents of the pull request template, or None if there
+    is no template.
+    """
     template_file_paths = [
         os.sep.join(path_parts).lstrip(os.path.sep)
         for path_parts in itertools.product(
