@@ -56,7 +56,7 @@ Here we describe how to use **Cogite** in a feature branch workflow
 
    Here is an example output::
 
-       cogite pr add
+       $ cogite pr add
        ✔ Pushed local branch to upstream.
        Confirm title and body:
        | Update README
@@ -72,6 +72,7 @@ Here we describe how to use **Cogite** in a feature branch workflow
    command also shows the status of each review. Here is an example
    output::
 
+       $ cogite status
        Checks:
          ✔ ci/circleci: Run quality checks (https://circleci.com/gh/dbaty/sandbox/11670
          ✔ ci/circleci: Run tests (https://circleci.com/gh/dbaty/sandbox/11671
@@ -83,6 +84,7 @@ Here we describe how to use **Cogite** in a feature branch workflow
 4. When ready to merge this pull request, run ``cogite pr merge``.
    Here is an example output::
 
+       $ cogite pr merge
        You are about to rebase new-feature on master and push master upstream.
        Continue [y/N]? y
        ✔ git checkout master

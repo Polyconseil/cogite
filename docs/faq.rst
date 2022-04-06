@@ -15,8 +15,8 @@ While looking for a new name to conquer the world, I was reading one
 of the Discworld novels. This is why Cogite comes from the first name
 of a character in the French edition: Cogite Stibon. In the English
 edition (as well as the German edition, apparently), the character is
-named Ponder Stibbons, which does not contain "git" or anything
-appropriate enough [#]_. So **Cogite** it is.
+named Ponder Stibbons, which does not contain "git" and is hence not
+particularly appropriate [#]_. So **Cogite** it is.
 
 You may pronounce it "Cojeete" (as in French) or "Cog-it". Or "that
 tool that's great". Really, I don't mind.
