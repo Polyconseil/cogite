@@ -1,4 +1,4 @@
-import yaspin  # type: ignore
+import yaspin
 
 from cogite import interaction
 
