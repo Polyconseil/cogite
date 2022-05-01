@@ -84,8 +84,8 @@ class Mock():
         call = Call(
             request=Request(
                 url=url,
-                data=request.data or b'',
-                headers=request.headers,
+                data=request.data or b'',  # type: ignore[arg-type]
+                headers=request.headers,  # type: ignore[arg-type]
             ),
             response=response,
         )
