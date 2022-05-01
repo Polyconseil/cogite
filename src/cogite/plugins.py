@@ -5,7 +5,7 @@ try:
     import importlib.metadata as importlib_metadata
 except ImportError:
     # Python < 3.8
-    import importlib_metadata  # type: ignore
+    import importlib_metadata  # type: ignore[no-redef]
 
 
 NAMESPACE_CI_URL_GETTER = 'cogite.plugins.ci_url_getter'
