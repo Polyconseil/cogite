@@ -8,6 +8,7 @@ from . import commands
 from . import config
 from . import context
 from . import errors
+from . import interaction
 from . import plugins
 from . import version
 
@@ -159,7 +160,7 @@ def main():
     try:
         _main()
     except errors.FatalError as error:
-        sys.exit(str(error))
+        sys.exit(interaction.interpret_rich_text(str(error)))
 
 
 if __name__ == '__main__':
