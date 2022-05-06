@@ -85,7 +85,7 @@ def _show_check_state(status):
                 f"  {_symbol_for_state(check.state)} {check.name} — {check.url}"
             )
     else:
-        interaction.display("[[errorr] Found no check.")
+        interaction.display("[[error]] Found no check.")
 
 
 def _symbol_for_state(state) -> str:
