@@ -2,7 +2,7 @@ import dataclasses
 import os
 import re
 import subprocess
-from typing import Iterable
+import typing
 
 from . import errors
 from . import spinner
@@ -41,10 +41,10 @@ def _run(command: str):
 def run(
     command: str,
     check_ok: bool = True,
-    expected_returncodes: Iterable[int] = (0,),
-    progress: str = None,
-    on_success: str = None,
-    on_failure: str = None,
+    expected_returncodes: typing.Iterable[int] = (0,),
+    progress: typing.Optional[str] = None,
+    on_success: typing.Optional[str] = None,
+    on_failure: typing.Optional[str] = None,
 ) -> CommandResult:
     """Run a command, possibly showing a spinner."""
     if not progress:

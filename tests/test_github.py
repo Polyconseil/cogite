@@ -60,10 +60,10 @@ def get_mock_response(request):
 @base.mock_authentication
 def test_repository():
     client = _make_client()
-    expected = {
-        "id": "MDEwOlJlcG9zaXRvcnkzMTM0MzAwMDg=",
-        "host_autodeletes_branch_on_merge": False,
-    }
+    expected = models.Repository(
+        id="MDEwOlJlcG9zaXRvcnkzMTM0MzAwMDg=",
+        host_autodeletes_branch_on_merge=False,
+    )
     with install_github_api_mock():
         assert client.repository == expected
     # Get it again, this time from the object (memory) cache.

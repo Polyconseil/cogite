@@ -27,7 +27,7 @@ class Configuration:
     ci_platform: Optional[str] = None
 
 
-def read_toml(path: pathlib.Path, section: str = None):
+def read_toml(path: pathlib.Path, section: Optional[str] = None):
     d = toml.loads(path.read_text())
     if section:
         for part in section.split('.'):

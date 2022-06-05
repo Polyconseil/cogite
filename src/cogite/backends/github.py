@@ -36,6 +36,8 @@ MUTATION_CREATE_PULL_REQUEST = get_graphql('mutation_create_pull_request')
 MUTATION_MARK_AS_READY = get_graphql('mutation_mark_as_ready')
 MUTATION_REQUEST_REVIEWS = get_graphql('mutation_request_reviews')
 
+UNSET = object()
+
 
 def _get_pull_request_status(response: dict) -> models.PullRequestStatus:
     pr_info = response['data']['node']
@@ -150,10 +152,14 @@ class GitHubApiClient(base.BaseClient):
         self.owner = context.owner
         self.branch = context.branch
 
+        # Set up caches here to make type checkers happy
+        self._repository = UNSET
+        self._session = UNSET
+
     @property
     def session(self):
-        if hasattr(self, '_session'):
-            return self._session  # pylint: disable=access-member-before-definition
+        if self._session != UNSET:
+            return self._session
         auth_token = auth.get_token(self.context.host_domain)
         if not auth_token:
             raise errors.FatalError(
@@ -176,21 +182,20 @@ class GitHubApiClient(base.BaseClient):
         return response.data
 
     @property
-    def repository(self) -> dict:
-        if hasattr(self, '_repository'):
-            return self._repository  # pylint: disable=access-member-before-definition
-        self._repository: dict = {}  # make mypy happy
+    def repository(self) -> models.Repository:
+        if self._repository != UNSET:
+            return self._repository
         cache_key = self.context.remote_url
         cached = cache.get(cache_key)
         if cached is not cache.NOT_SET:
-            self._repository = cached
+            self._repository = models.Repository(**cached)
             return self._repository
         repository = self._get_repository_from_host()
-        cache.set(cache_key, repository)
+        cache.set(cache_key, dataclasses.asdict(repository))
         self._repository = repository
         return repository
 
-    def _get_repository_from_host(self) -> dict:
+    def _get_repository_from_host(self) -> models.Repository:
         query = QUERY_REPOSITORY
         variables = {
             'owner': self.owner,
@@ -198,10 +203,10 @@ class GitHubApiClient(base.BaseClient):
         }
         response = self._post(query, variables)
         repo_info = response['data']['repository']
-        return {
-            'id': repo_info['id'],
-            'host_autodeletes_branch_on_merge': repo_info['deleteBranchOnMerge']
-        }
+        return models.Repository(
+            id=repo_info['id'],
+            host_autodeletes_branch_on_merge=repo_info['deleteBranchOnMerge'],
+        )
 
     @property
     def pull_request(self):
@@ -209,7 +214,7 @@ class GitHubApiClient(base.BaseClient):
             self._pull_request = self.get_pull_request()
         return self._pull_request
 
-    def get_pull_request(self, branch=None) -> Optional[models.PullRequest]:
+    def get_pull_request(self, branch: Optional[str] = None) -> Optional[models.PullRequest]:
         branch = branch or self.context.branch
         query = QUERY_PULL_REQUEST
         variables = {
@@ -229,7 +234,7 @@ class GitHubApiClient(base.BaseClient):
         pr_info = data['nodes'][0]
         return models.PullRequest(
             destination_branch=pr_info['baseRefName'],
-            host_autodeletes_branch_on_merge=self.repository['host_autodeletes_branch_on_merge'],
+            host_autodeletes_branch_on_merge=self.repository.host_autodeletes_branch_on_merge,
             id=pr_info['id'],
             number=pr_info['number'],
             url=pr_info['permalink'],
@@ -246,7 +251,7 @@ class GitHubApiClient(base.BaseClient):
     ) -> models.PullRequest:
         mutation = MUTATION_CREATE_PULL_REQUEST
         variables = {
-            'repositoryId': self.repository['id'],
+            'repositoryId': self.repository.id,
             'headRefName': head,
             'baseRefName': base,
             'body': body,
@@ -259,7 +264,7 @@ class GitHubApiClient(base.BaseClient):
         pr_info = response['data']['createPullRequest']['pullRequest']
         return models.PullRequest(
             destination_branch=base,
-            host_autodeletes_branch_on_merge=self.repository['host_autodeletes_branch_on_merge'],
+            host_autodeletes_branch_on_merge=self.repository.host_autodeletes_branch_on_merge,
             id=pr_info['id'],
             number=pr_info['number'],
             url=pr_info['permalink'],

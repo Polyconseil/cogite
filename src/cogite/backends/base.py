@@ -20,7 +20,7 @@ class BaseClient:
     ) -> models.PullRequest:
         raise NotImplementedError()
 
-    def get_pull_request(self, branch: str = None) -> Optional[models.PullRequest]:
+    def get_pull_request(self, branch: Optional[str] = None) -> Optional[models.PullRequest]:
         raise NotImplementedError()
 
     def mark_pull_request_as_ready(self):

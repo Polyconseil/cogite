@@ -61,3 +61,9 @@ class PullRequestStatus:
     sha: str
     checks: List[PullRequestCheck] = dataclasses.field(default_factory=list)
     reviews: List[PullRequestReview] = dataclasses.field(default_factory=list)
+
+
+@dataclasses.dataclass
+class Repository:
+    id: str
+    host_autodeletes_branch_on_merge: bool
