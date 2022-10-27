@@ -103,6 +103,8 @@ def _symbol_for_state(state) -> str:
         return interaction.StatusSymbol.QUESTION.value
     if state in (models.CommitState.PENDING, models.ReviewState.PENDING):
         return interaction.StatusSymbol.PENDING.value
+    if state == models.CommitState.NEUTRAL:
+        return interaction.StatusSymbol.NEUTRAL.value
     raise ValueError(f"Unexpected state: {state}")
 
 
@@ -115,4 +117,6 @@ def _curses_color(state):
         return curses.COLOR_RED
     if state == models.CommitState.UNKNOWN:
         return curses.COLOR_WHITE
+    if state == models.CommitState.NEUTRAL:
+        return curses.COLOR_CYAN
     raise ValueError(f"Unexpected state: {state}")

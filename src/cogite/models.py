@@ -6,6 +6,7 @@ from typing import List
 class CommitState(enum.Enum):
     ERROR = 'error'
     FAILURE = 'failure'
+    NEUTRAL = 'neutral'
     PENDING = 'pending'
     SUCCESS = 'success'
     # `UNKNOWN` is used in Cogite when the status reported by GitHub:

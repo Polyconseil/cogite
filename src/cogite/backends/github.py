@@ -126,7 +126,7 @@ def _gh_check_run_status_to_cogite_commit_state(status: str, conclusion: str) ->
         'ACTION_REQUIRED': models.CommitState.UNKNOWN,
         'CANCELLED': models.CommitState.FAILURE,
         'FAILURE': models.CommitState.FAILURE,
-        'NEUTRAL': models.CommitState.UNKNOWN,
+        'NEUTRAL': models.CommitState.NEUTRAL,
         'SKIPPED': models.CommitState.SUCCESS,
         'STALE': models.CommitState.UNKNOWN,
         'STARTUP_FAILURE': models.CommitState.FAILURE,

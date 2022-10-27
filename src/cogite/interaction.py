@@ -26,6 +26,7 @@ class StatusSymbol(enum.Enum):
     SKIPPED = "[[grey]]✔[[/]]"
     WARNING = "[[red]]⚠[[/]]"
     ERROR = "[[red]]✖[[/]]"
+    NEUTRAL = "[[cyan]]⊘[[/]]"
     PENDING = "[[cyan]]…[[/]]"
     QUESTION = "[[yellow]]?[[/]]"
     QUOTATION = "[[grey]]|[[/]]"
