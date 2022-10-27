@@ -1,5 +1,6 @@
 import collections
 import dataclasses
+import itertools
 import os
 import pathlib
 import pprint
@@ -65,7 +66,10 @@ def _get_pull_request_status(response: dict) -> models.PullRequestStatus:
                 ),
                 url=run['permalink'],
             )
-            for run in commit_info['checkSuites']['nodes'][0]['checkRuns']['nodes']
+            for run in itertools.chain.from_iterable(
+                suite_nodes['checkRuns'].get("nodes", [])
+                for suite_nodes in commit_info["checkSuites"]["nodes"]
+            )
         ])
 
     # The 'reviews' nodes in the response only contain reviews

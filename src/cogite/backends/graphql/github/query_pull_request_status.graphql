@@ -7,7 +7,7 @@ query pullRequestStatus (
         nodes {
           commit {
             oid,
-            checkSuites(last: 1) {
+            checkSuites(last: 50) {
               nodes {
                 checkRuns(last: 50) {
                   nodes {
