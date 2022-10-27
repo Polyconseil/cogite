@@ -15,7 +15,7 @@ def choose_token_getter(getters):
         choices_help = ', '.join(str(i) for i in range(1, len(getters)))
         choices_help += f' or {len(getters)}'
         choice = input(
-            f"Please choose one of the methods above by typing {choices_help}: "
+            f"Please choose one of the methods above by typing {choices_help}, followed by Enter: "
         )
         try:
             choice = int(choice)
