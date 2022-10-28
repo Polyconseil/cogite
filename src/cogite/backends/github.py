@@ -71,6 +71,7 @@ def _get_pull_request_status(response: dict) -> models.PullRequestStatus:
                 for suite_nodes in commit_info["checkSuites"]["nodes"]
             )
         ])
+    status.checks.sort(key=lambda check: check.name)
 
     # The 'reviews' nodes in the response only contain reviews
     # that have been performed. Pending reviews are only available
