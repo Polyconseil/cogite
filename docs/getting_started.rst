@@ -30,8 +30,6 @@ Minimal configuration
 
 2. Run ``cogite auth add`` and follow instructions.
 
-   FIXME: explain the two current options : manual token or automatic configuration.
-
    For further details about authentication-related commands, see
    :ref:`features_authentication` and :ref:`commands_auth`.
 
