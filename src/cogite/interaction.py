@@ -23,6 +23,7 @@ class OutputContext(enum.Enum):
 
 class StatusSymbol(enum.Enum):
     SUCCESS = "[[green]]✔[[/]]"
+    SKIPPED = "[[grey]]✔[[/]]"
     WARNING = "[[red]]⚠[[/]]"
     ERROR = "[[red]]✖[[/]]"
     PENDING = "[[cyan]]…[[/]]"
