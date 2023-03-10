@@ -58,6 +58,12 @@ def get_parser():
             dest='base_branch',
             help='branch where changes should be applied. Defaults to the master branch.',
         )
+        subparser.add_argument(
+            '--ignore-template',
+            action='store_true',
+            dest='ignore_template',
+            help='Ignore (i.e. do not use) pull request template.',
+        )
 
     pr_add.add_argument(
         '--draft',

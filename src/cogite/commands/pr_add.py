@@ -17,7 +17,13 @@ def add_draft_pull_request(ctx: context.Context, **kwargs):
     return add_pull_request(ctx, draft=True, **kwargs)
 
 
-def add_pull_request(ctx: context.Context, *, base_branch: str, draft: bool=False):
+def add_pull_request(
+    ctx: context.Context,
+    *,
+    base_branch: str,
+    ignore_template: bool = False,
+    draft: bool = False,
+):
     client = ctx.client
     configuration = ctx.configuration
     base_branch = base_branch or configuration.master_branch
@@ -33,7 +39,10 @@ def add_pull_request(ctx: context.Context, *, base_branch: str, draft: bool=Fals
         )
     )
 
-    pull_request_template = _get_pull_request_template()
+    if ignore_template:
+        pull_request_template = None
+    else:
+        pull_request_template = _get_pull_request_template()
     content = os.linesep.join(
         filter(None, [commits_text, pull_request_template])
     ).strip()
