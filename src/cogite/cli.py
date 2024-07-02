@@ -150,7 +150,7 @@ def _main():
     client = api.get_client(configuration, ctx)
 
     if not client:
-        sys.exit(f"Could not find any backend for platform '{configuration.platform}'")
+        sys.exit(f"Could not find any backend for platform '{configuration.host_platform}'")
 
     args = dict(vars(parse_args()))
     callback = args.pop('callback')
