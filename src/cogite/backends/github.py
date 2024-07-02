@@ -76,6 +76,12 @@ def _get_pull_request_status(response: dict) -> models.PullRequestStatus:
     # an Author object (with only the login) in 'reviews'. We'll
     # use the lowest common denominator, i.e. login only.
     for request in pr_info['reviewRequests']['nodes']:
+        # FIXME: the "requestedReviewer" could be a team. Accessing
+        # the team's name requires "read:org" or "read:discussion"
+        # scopes. These are not scopes that are granted to our app,
+        # for now, and I am not willing to change that as it seems a
+        # bit too broad. Perhaps it could be an option?
+        login = request['requestedReviewer'].get("login", "team (code owner)")
         user_reviews = reviews[request['requestedReviewer']['login']]
         user_reviews.append(models.ReviewState.PENDING)
     for review in pr_info['reviews']['nodes']:
